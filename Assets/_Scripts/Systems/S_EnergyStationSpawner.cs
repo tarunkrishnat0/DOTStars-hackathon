@@ -34,14 +34,14 @@ public partial struct S_EnergyStationSpawner : ISystem
         //ToDo: How to use UnityEngineComponent?
         //var count = SystemAPI.ManagedAPI.UnityEngineComponent<EnergySystemAndRobotSpawnCtrl.instance>();
 
-        int totalNumberOfEnergySystemsToSpawn = EnergySystemAndRobotSpawnCtrl.instance.numberOfEnergySystemsToSpawn;
+        int totalNumberOfEnergySystemsToSpawn = energyStationConfig.NumberOfEnergyStationsToSpawn;// EnergySystemAndRobotSpawnCtrl.Instance.numberOfEnergySystemsToSpawn;
         for (int i = energySystemsCount; i < totalNumberOfEnergySystemsToSpawn; i++)
         {
             var position = Utilities.GetRandomPositionInGrid(random, gameConfig.TerrainMinBoundaries.x, gameConfig.TerrainMaxBoundaries.x);
             Utilities.SpawnEnergyStation(energyStationConfig.Prefab, position, ecb, random, energyStationConfig.MinSpeed, energyStationConfig.MaxSpeed, energyStationConfig.EnergyStationHealth);
         }
 
-        SpawnCategory spawnCategory = EnergySystemAndRobotSpawnCtrl.instance.getSelectedSpawnCategory();
+        SpawnCategory spawnCategory = SystemAPI.GetSingleton<C_CurrentSpawnCategoryOfMouseClick>().spawnCategory;
         if (spawnCategory != SpawnCategory.ENERGY_SYSTEM)
         {
             return;

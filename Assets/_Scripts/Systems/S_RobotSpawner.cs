@@ -24,16 +24,18 @@ public partial struct S_RobotSpawner : ISystem
     {
     }
 
-    [BurstCompile]
+    //[BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
         var spawnerConfig = SystemAPI.GetSingleton<C_RobotSpawnerConfig>();
+        var spawnerCount = SystemAPI.GetSingleton<C_RobotsSpawnCount>();
         var gameConfig = SystemAPI.GetSingleton<C_GameConfig>();
         var random = SystemAPI.GetSingletonRW<C_GameRandom>();
         
         var ecb = SystemAPI.GetSingleton<BeginInitializationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(state.WorldUnmanaged);
 
         EntityQuery query = state.EntityManager.CreateEntityQuery(ComponentType.ReadOnly(typeof(T_Robot)));
+        //EntityQuery query = SystemAPI.QueryBuilder().WithAll<T_Robot>().Build();
         query.AddSharedComponentFilter(new T_Robot() { spawnCategory = SpawnCategory.DUMB_ROBOT });
 
         var robotsCat1Count = query.CalculateEntityCount();
@@ -68,16 +70,16 @@ public partial struct S_RobotSpawner : ISystem
             });
         }
 
-        int totalNumberOfCategory1RobotsToSpawn = EnergySystemAndRobotSpawnCtrl.instance.numberOfCategory1RobotsToSpawn;
-        //Debug.Log("totalNumberOfCategory1RobotsToSpawn : " + totalNumberOfCategory1RobotsToSpawn + " robotsCat1Count : " + robotsCat1Count);
-        for (int index = robotsCat1Count; index < totalNumberOfCategory1RobotsToSpawn; index++)
+        int totalNumberOfDumbRobotsToSpawn = spawnerCount.NumberOfDumbRobotsToSpawn;
+        // Debug.Log("totalNumberOfDumbRobotsToSpawn : " + totalNumberOfDumbRobotsToSpawn + " robotsCat1Count : " + robotsCat1Count);
+        for (int index = robotsCat1Count; index < totalNumberOfDumbRobotsToSpawn; index++)
         {
             var position = random.ValueRW.random.NextFloat3(gameConfig.TerrainMinBoundaries.x, gameConfig.TerrainMaxBoundaries.x);
             position.y = 1f;             
             SpawnRobot(position, SpawnCategory.DUMB_ROBOT);
         }
 
-        int totalNumberOfCategory2RobotsToSpawn = EnergySystemAndRobotSpawnCtrl.instance.numberOfCategory2RobotsToSpawn;
+        int totalNumberOfCategory2RobotsToSpawn = spawnerCount.NumberOfSemiSmartRobotsToSpawn;
         for (int index = robotsCat2Count; index < totalNumberOfCategory2RobotsToSpawn; index++)
         {
             var position = random.ValueRW.random.NextFloat3(gameConfig.TerrainMinBoundaries.x, gameConfig.TerrainMaxBoundaries.x);
@@ -85,7 +87,7 @@ public partial struct S_RobotSpawner : ISystem
             SpawnRobot(position, SpawnCategory.SEMI_SMART_ROBOT);
         }
 
-        int totalNumberOfCategory3RobotsToSpawn = EnergySystemAndRobotSpawnCtrl.instance.numberOfCategory3RobotsToSpawn;
+        int totalNumberOfCategory3RobotsToSpawn = spawnerCount.NumberOfSmartRobotsToSpawn;
         for (int index = robotsCat3Count; index < totalNumberOfCategory3RobotsToSpawn; index++)
         {
             var position = random.ValueRW.random.NextFloat3(gameConfig.TerrainMinBoundaries.x, gameConfig.TerrainMaxBoundaries.x);
@@ -93,7 +95,7 @@ public partial struct S_RobotSpawner : ISystem
             SpawnRobot(position, SpawnCategory.SMART_ROBOT);
         }
 
-        SpawnCategory spawnCategory = EnergySystemAndRobotSpawnCtrl.instance.getSelectedSpawnCategory();
+        SpawnCategory spawnCategory = SystemAPI.GetSingleton<C_CurrentSpawnCategoryOfMouseClick>().spawnCategory;
         if (spawnCategory != SpawnCategory.ENERGY_SYSTEM)
         {
             PhysicsWorldSingleton physicsWorld = SystemAPI.GetSingleton<PhysicsWorldSingleton>();

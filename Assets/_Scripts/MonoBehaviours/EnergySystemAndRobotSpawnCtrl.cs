@@ -1,5 +1,6 @@
 using System;
 using TMPro;
+using Unity.Collections;
 using Unity.Entities;
 using UnityEngine;
 using UnityEngine.UI;
@@ -14,12 +15,10 @@ public enum SpawnCategory
 
 public class EnergySystemAndRobotSpawnCtrl : MonoBehaviour
 {
-    public static EnergySystemAndRobotSpawnCtrl instance;
-
     [Space]
-    public int numberOfCategory1RobotsToSpawn;
-    public int numberOfCategory2RobotsToSpawn;
-    public int numberOfCategory3RobotsToSpawn;
+    public int numberOfDumbRobotsToSpawn;
+    public int numberOfSemiSmartRobotsToSpawn;
+    public int numberOfSmartRobotsToSpawn;
     public int numberOfEnergySystemsToSpawn;
 
     [Space]
@@ -30,17 +29,20 @@ public class EnergySystemAndRobotSpawnCtrl : MonoBehaviour
     public TMP_Dropdown spawnCategoryDropDown;
 
     private World _world = null;
-
-    private void Awake()
-    {
-        if (instance == null)
-        {
-            instance = this;
-        }
-    }
+    private Entity _entity;
 
     private void Start()
     {
+        _world = World.DefaultGameObjectInjectionWorld;
+        
+        if (_world.IsCreated && !_world.EntityManager.Exists(_entity))
+        {
+            _entity = _world.EntityManager.CreateEntity();
+            _world.EntityManager.AddComponent<C_CurrentSpawnCategoryOfMouseClick>(_entity);
+            _world.EntityManager.AddComponent<C_RobotsSpawnCount>(_entity);
+        }
+        SetRobotSpawnCountInConfig();
+
         populateSpawnCategoryList();
         addButtonListeners();
     }
@@ -51,9 +53,18 @@ public class EnergySystemAndRobotSpawnCtrl : MonoBehaviour
         spawnCategoryDropDown.options.Add(new TMP_Dropdown.OptionData() { text = "<color=\"red\">" + SpawnCategory.DUMB_ROBOT.ToString() + "</color>" });
         spawnCategoryDropDown.options.Add(new TMP_Dropdown.OptionData() { text = "<color=\"green\">" + SpawnCategory.SEMI_SMART_ROBOT.ToString() + "</color>" });
         spawnCategoryDropDown.options.Add(new TMP_Dropdown.OptionData() { text = "<color=\"blue\">" + SpawnCategory.SMART_ROBOT.ToString() + "</color>" });
-        spawnCategoryDropDown.options.Add(new TMP_Dropdown.OptionData() { text = SpawnCategory.ENERGY_SYSTEM.ToString() });
+        //spawnCategoryDropDown.options.Add(new TMP_Dropdown.OptionData() { text = SpawnCategory.ENERGY_SYSTEM.ToString() });
 
+        spawnCategoryDropDown.onValueChanged.RemoveAllListeners();
+        spawnCategoryDropDown.onValueChanged.AddListener(Dropdown_OnValueChanged);
         spawnCategoryDropDown.value = 2;
+
+    }
+
+    private void Dropdown_OnValueChanged(int index)
+    {
+        SpawnCategory spawnCategory = getSelectedSpawnCategory();
+        SetCategoryInEntity(spawnCategory);
     }
 
     private void addButtonListeners()
@@ -82,17 +93,20 @@ public class EnergySystemAndRobotSpawnCtrl : MonoBehaviour
 
     private void onClickOfRandomSpawnButtonForCategory1Robots()
     {
-        numberOfCategory1RobotsToSpawn = GetRobotsCount(SpawnCategory.DUMB_ROBOT) + 50;
+        numberOfDumbRobotsToSpawn = GetRobotsCount(SpawnCategory.DUMB_ROBOT) + 50;
+        SetRobotSpawnCountInConfig();
     }
 
     private void onClickOfRandomSpawnButtonForCategory2Robots()
     {
-        numberOfCategory2RobotsToSpawn = GetRobotsCount(SpawnCategory.SEMI_SMART_ROBOT) + 50;
+        numberOfSemiSmartRobotsToSpawn = GetRobotsCount(SpawnCategory.SEMI_SMART_ROBOT) + 50;
+        SetRobotSpawnCountInConfig();
     }
 
     private void onClickOfRandomSpawnButtonForCategory3Robots()
     {
-        numberOfCategory3RobotsToSpawn = GetRobotsCount(SpawnCategory.SMART_ROBOT) + 50;
+        numberOfSmartRobotsToSpawn = GetRobotsCount(SpawnCategory.SMART_ROBOT) + 50;
+        SetRobotSpawnCountInConfig();
     }
 
     private void onClickOfRandomSpawnButtonForEnergySystems()
@@ -102,11 +116,6 @@ public class EnergySystemAndRobotSpawnCtrl : MonoBehaviour
 
     private int GetRobotsCount(SpawnCategory spawnCategory)
     {
-        if(_world == null)
-        {
-            _world = World.DefaultGameObjectInjectionWorld;
-        }
-
         EntityQuery query = _world.EntityManager.CreateEntityQuery(ComponentType.ReadOnly(typeof(T_Robot)));
         query.AddSharedComponentFilter(new T_Robot() { spawnCategory = spawnCategory });
         return query.CalculateEntityCount();
@@ -114,12 +123,31 @@ public class EnergySystemAndRobotSpawnCtrl : MonoBehaviour
 
     private int GetEnergyStationsCount()
     {
-        if (_world == null)
-        {
-            _world = World.DefaultGameObjectInjectionWorld;
-        }
-
         EntityQuery query = _world.EntityManager.CreateEntityQuery(ComponentType.ReadOnly(typeof(T_EnergyStation)));
         return query.CalculateEntityCount();
+    }
+
+    private void SetRobotSpawnCountInConfig()
+    {
+        _world.EntityManager.SetComponentData(_entity, new C_RobotsSpawnCount() {
+            NumberOfDumbRobotsToSpawn = numberOfDumbRobotsToSpawn,
+            NumberOfSemiSmartRobotsToSpawn = numberOfSemiSmartRobotsToSpawn,
+            NumberOfSmartRobotsToSpawn = numberOfSmartRobotsToSpawn,
+        });
+    }
+
+    private void SetCategoryInEntity(SpawnCategory spawnCategory)
+    {
+        _world.EntityManager.SetComponentData(_entity, new C_CurrentSpawnCategoryOfMouseClick() { spawnCategory = spawnCategory });
+    }
+
+    private void OnDestroy()
+    {
+        if (_world.IsCreated && _world.EntityManager.Exists(_entity))
+        {
+            _world.EntityManager.DestroyEntity(_entity);
+        }
+
+        spawnCategoryDropDown.onValueChanged.RemoveAllListeners();
     }
 }
