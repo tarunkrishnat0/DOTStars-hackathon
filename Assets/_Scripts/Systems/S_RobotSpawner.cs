@@ -69,7 +69,7 @@ public partial struct S_RobotSpawner : ISystem
         }
 
         int totalNumberOfCategory1RobotsToSpawn = EnergySystemAndRobotSpawnCtrl.instance.numberOfCategory1RobotsToSpawn;
-        Debug.Log("totalNumberOfCategory1RobotsToSpawn : " + totalNumberOfCategory1RobotsToSpawn + " robotsCat1Count : " + robotsCat1Count);
+        //Debug.Log("totalNumberOfCategory1RobotsToSpawn : " + totalNumberOfCategory1RobotsToSpawn + " robotsCat1Count : " + robotsCat1Count);
         for (int index = robotsCat1Count; index < totalNumberOfCategory1RobotsToSpawn; index++)
         {
             var position = random.ValueRW.random.NextFloat3(gameConfig.TerrainMinBoundaries.x, gameConfig.TerrainMaxBoundaries.x);
