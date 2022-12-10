@@ -33,12 +33,15 @@ public partial struct S_RobotMovement : ISystem
 
         var ecbEOS = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(state.WorldUnmanaged).AsParallelWriter();
 
+        var timeCount = SystemAPI.Time.ElapsedTime;
+
         new RobotMovementJob() {
             DeltaTime = deltaTime,
             GameConfig = gameConfig,
             EnergyStationTransforms = energyStationTransforms,
             EneryStationColors = energyStationColors,
-            ECB = ecbEOS
+            ECB = ecbEOS,
+            TimeCount = (int)timeCount
         }.ScheduleParallel();
     }
 }
@@ -52,6 +55,7 @@ public partial struct RobotMovementJob : IJobEntity
     public EntityCommandBuffer.ParallelWriter ECB;
     [ReadOnly] public NativeArray<LocalTransform> EnergyStationTransforms;
     [ReadOnly] public NativeArray<URPMaterialPropertyBaseColor> EneryStationColors;
+    [ReadOnly] public int TimeCount;
 
     [BurstCompile]
     public void Execute(Entity entity, ref TransformAspect transform, ref C_RobotMovementProperties movementProperties,
@@ -95,8 +99,8 @@ public partial struct RobotMovementJob : IJobEntity
             emissionColor.Value = baseColor.Value;
 
             if (robotTag.spawnCategory == SpawnCategory.SMART_ROBOT ||
-                (robotTag.spawnCategory == SpawnCategory.SEMI_SMART_ROBOT && System.DateTime.Now.Second % 3 == 0) ||
-                (robotTag.spawnCategory == SpawnCategory.DUMB_ROBOT && System.DateTime.Now.Second % 7 == 0))
+                (robotTag.spawnCategory == SpawnCategory.SEMI_SMART_ROBOT && TimeCount % 3 == 0) ||
+                (robotTag.spawnCategory == SpawnCategory.DUMB_ROBOT && TimeCount % 7 == 0))
             {
                 movementProperties.Direction = directionTowardsNearestEnergyStation;
             }
