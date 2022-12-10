@@ -33,8 +33,17 @@ public partial struct S_RobotSpawner : ISystem
         
         var ecb = SystemAPI.GetSingleton<BeginInitializationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(state.WorldUnmanaged);
 
-        var query = SystemAPI.QueryBuilder().WithAll<T_Robot>().Build();
-        var robotsCount = query.CalculateEntityCount();
+        EntityQuery query = state.EntityManager.CreateEntityQuery(ComponentType.ReadOnly(typeof(T_Robot)));
+        query.AddSharedComponentFilter(new T_Robot() { spawnCategory = SpawnCategory.ROBOT_CATEGORY_1 });
+
+        var robotsCat1Count = query.CalculateEntityCount();
+        query.ResetFilter();
+        query.AddSharedComponentFilter(new T_Robot() { spawnCategory = SpawnCategory.ROBOT_CATEGORY_2 });
+        var robotsCat2Count = query.CalculateEntityCount();
+        query.ResetFilter();
+        query.AddSharedComponentFilter(new T_Robot() { spawnCategory = SpawnCategory.ROBOT_CATEGORY_3 });
+        var robotsCat3Count = query.CalculateEntityCount();
+        //Debug.Log($"CAT1={robotsCat1Count}, CAT2={robotsCat2Count}, CAT3={robotsCat3Count}");
 
         void SpawnRobot(float3 position, SpawnCategory spawnCategory)
         {
@@ -46,7 +55,7 @@ public partial struct S_RobotSpawner : ISystem
                 Scale = 1,
             });
 
-            ecb.AddComponent(entity, new T_Robot() { spawnCategory = spawnCategory });
+            ecb.AddSharedComponent<T_Robot>(entity, new T_Robot() { spawnCategory = spawnCategory });
             ecb.AddComponent<URPMaterialPropertyBaseColor>(entity);
             ecb.AddComponent<URPMaterialPropertyEmissionColor>(entity);
 
@@ -59,30 +68,34 @@ public partial struct S_RobotSpawner : ISystem
             });
         }
 
-        SpawnCategory spawnCategory;
-        for (int index = robotsCount; index < spawnerConfig.NumberOfRobotsToSpawn; index++)
+        int totalNumberOfCategory1RobotsToSpawn = EnergySystemAndRobotSpawnCtrl.instance.numberOfCategory1RobotsToSpawn +
+            spawnerConfig.NumberOfCategory1RobotsToSpawn;
+        for (int index = robotsCat1Count; index < totalNumberOfCategory1RobotsToSpawn; index++)
+        {
+            var position = random.ValueRW.random.NextFloat3(gameConfig.TerrainMinBoundaries.x, gameConfig.TerrainMaxBoundaries.x);
+            position.y = 1f;             
+            SpawnRobot(position, SpawnCategory.ROBOT_CATEGORY_1);
+        }
+
+        int totalNumberOfCategory2RobotsToSpawn = EnergySystemAndRobotSpawnCtrl.instance.numberOfCategory2RobotsToSpawn +
+            spawnerConfig.NumberOfCategory2RobotsToSpawn;
+        for (int index = robotsCat2Count; index < totalNumberOfCategory2RobotsToSpawn; index++)
         {
             var position = random.ValueRW.random.NextFloat3(gameConfig.TerrainMinBoundaries.x, gameConfig.TerrainMaxBoundaries.x);
             position.y = 1f;
-             
-            if (index % 3 == 0)
-            {
-                spawnCategory = SpawnCategory.ROBOT_CATEGORY_1;
-            }
-            else if (index % 3 == 1)
-            {
-                spawnCategory = SpawnCategory.ROBOT_CATEGORY_2;
-            }
-            else
-            {
-                spawnCategory = SpawnCategory.ROBOT_CATEGORY_3;
-            }
-
-            SpawnRobot(position, spawnCategory);
+            SpawnRobot(position, SpawnCategory.ROBOT_CATEGORY_2);
         }
 
+        int totalNumberOfCategory3RobotsToSpawn = EnergySystemAndRobotSpawnCtrl.instance.numberOfCategory3RobotsToSpawn +
+            spawnerConfig.NumberOfCategory3RobotsToSpawn;
+        for (int index = robotsCat3Count; index < totalNumberOfCategory3RobotsToSpawn; index++)
+        {
+            var position = random.ValueRW.random.NextFloat3(gameConfig.TerrainMinBoundaries.x, gameConfig.TerrainMaxBoundaries.x);
+            position.y = 1f;
+            SpawnRobot(position, SpawnCategory.ROBOT_CATEGORY_3);
+        }
 
-        spawnCategory = EnergySystemAndRobotSpawnCtrl.instance.getSelectedSpawnCategory();
+        SpawnCategory spawnCategory = EnergySystemAndRobotSpawnCtrl.instance.getSelectedSpawnCategory();
         if (spawnCategory == SpawnCategory.ENERGY_SYSTEM)
         {
             return;
@@ -112,7 +125,7 @@ public partial struct S_RobotSpawner : ISystem
         // Set Colors
         foreach (var (hatProperties, entity) in SystemAPI.Query<C_RobotFooterProperties>().WithEntityAccess())
         {
-            var spawnCategory1 = state.EntityManager.GetComponentData<T_Robot>(hatProperties.Parent).spawnCategory;
+            var spawnCategory1 = state.EntityManager.GetSharedComponentManaged<T_Robot>(hatProperties.Parent).spawnCategory;
             //Debug.Log("spawnCategory1 : " + spawnCategory1.ToString());
             Color color = spawnCategory1 switch
             {
