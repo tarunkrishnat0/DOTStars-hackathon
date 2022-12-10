@@ -19,7 +19,7 @@ public class GameConfig : MonoBehaviour
 
 			AddComponent(new C_GameRandom()
 			{
-				random = Unity.Mathematics.Random.CreateFromIndex(12345),
+				random = Unity.Mathematics.Random.CreateFromIndex((uint)System.DateTime.Now.Millisecond),
 			});
 		}
 	}
