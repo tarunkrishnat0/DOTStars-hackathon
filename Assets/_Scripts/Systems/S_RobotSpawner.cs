@@ -3,6 +3,7 @@ using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
 
+[UpdateInGroup(typeof(InitializationSystemGroup))]
 [BurstCompile]
 public partial struct S_RobotSpawner : ISystem
 {
@@ -24,7 +25,10 @@ public partial struct S_RobotSpawner : ISystem
         var gameConfig = SystemAPI.GetSingleton<C_GameConfig>();
         var random = SystemAPI.GetSingletonRW<C_GameRandom>();
 
-        var ecb = new EntityCommandBuffer(Unity.Collections.Allocator.Temp);
+        // var ecb = new EntityCommandBuffer(Unity.Collections.Allocator.Temp);
+        
+        var ecb = SystemAPI.GetSingleton<BeginInitializationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(state.WorldUnmanaged);
+
         for(int i = 0; i < spawnerConfig.NumberOfRobotsToSpawn; i++)
         {
             var entity = ecb.Instantiate(spawnerConfig.Prefab);
@@ -33,12 +37,21 @@ public partial struct S_RobotSpawner : ISystem
             ecb.SetComponent(entity, new LocalTransform()
             {
                 Position = position,
-                Rotation = quaternion.RotateY(random.ValueRW.random.NextFloat(0, 360)),
+                Rotation = quaternion.LookRotation(position, math.up()),
                 Scale = 1,
             });
+            ecb.AddComponent<T_Robot>(entity);
+            position.y = 0f;
+            var direction = math.normalize(position);
+            ecb.AddComponent(entity, new C_RobotMovementProperties()
+            {
+                Direction = direction,
+                Speed = random.ValueRW.random.NextFloat(spawnerConfig.MinSpeed, spawnerConfig.MaxSpeed),
+            });
         }
-        ecb.Playback(state.EntityManager);
-        ecb.Dispose();
+
+        //ecb.Playback(state.EntityManager);
+        //ecb.Dispose();
 
         state.Enabled = false;
     }

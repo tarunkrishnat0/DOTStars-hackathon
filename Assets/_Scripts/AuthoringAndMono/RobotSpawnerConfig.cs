@@ -5,6 +5,8 @@ public class RobotSpawnerConfig : MonoBehaviour
 {
 	public GameObject RobotPrefab;
 	public int NumberOfRobotsToSpawn;
+	public float MaxSpeed;
+	public float MinSpeed;
 
 	class Baker : Baker<RobotSpawnerConfig>
 	{
@@ -14,6 +16,8 @@ public class RobotSpawnerConfig : MonoBehaviour
 			{
 				Prefab = GetEntity(authoring.RobotPrefab),
 				NumberOfRobotsToSpawn = authoring.NumberOfRobotsToSpawn,
+				MaxSpeed = authoring.MaxSpeed,
+				MinSpeed = authoring.MinSpeed
 			});
 		}
 	}
