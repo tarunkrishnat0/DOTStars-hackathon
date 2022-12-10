@@ -53,8 +53,9 @@ public partial struct RobotMovementJob : IJobEntity
     [ReadOnly] public NativeArray<URPMaterialPropertyBaseColor> EneryStationColors;
 
     [BurstCompile]
-    public void Execute(Entity entity, ref TransformAspect transform, ref C_RobotMovementProperties movementProperties, 
-        [EntityIndexInQuery] int sortKey, ref URPMaterialPropertyBaseColor baseColor, ref URPMaterialPropertyEmissionColor emissionColor)
+    public void Execute(Entity entity, ref TransformAspect transform, ref C_RobotMovementProperties movementProperties,
+        [EntityIndexInQuery] int sortKey, ref URPMaterialPropertyBaseColor baseColor, ref URPMaterialPropertyEmissionColor emissionColor,
+        in T_Robot robotTag)
     {
         float maxDistance = 100f * math.sqrt(2);
         float minDistance = float.MaxValue;
@@ -84,18 +85,24 @@ public partial struct RobotMovementJob : IJobEntity
 
         var energyStationTempColor = EneryStationColors[nearestEnergyStationIndex].Value;
         float3 energeStationColor = new float3(energyStationTempColor.x, energyStationTempColor.y, energyStationTempColor.z);
-        float3 finalColor = math.lerp(new float3(1,1,1), energeStationColor, closenessfactor);
+        float3 finalColor = math.lerp(new float3(1, 1, 1), energeStationColor, closenessfactor);
 
         baseColor.Value = new Vector4(finalColor.x, finalColor.y, finalColor.z, 1);
         emissionColor.Value = baseColor.Value;
 
-        movementProperties.Direction = directionTowardsNearestEnergyStation;
+        if (robotTag.spawnCategory == SpawnCategory.ROBOT_CATEGORY_3 ||
+            (robotTag.spawnCategory == SpawnCategory.ROBOT_CATEGORY_2 && System.DateTime.Now.Second % 3 == 0) ||
+            (robotTag.spawnCategory == SpawnCategory.ROBOT_CATEGORY_1 && System.DateTime.Now.Second % 7 == 0))
+        {
+            movementProperties.Direction = directionTowardsNearestEnergyStation;
+        }
 
         var position = transform.LocalPosition + movementProperties.Direction * movementProperties.Speed * DeltaTime;
-        if (position.x > GameConfig.TerrainMaxBoundaries.x || position.x < GameConfig.TerrainMinBoundaries.x) {
+        if (position.x > GameConfig.TerrainMaxBoundaries.x || position.x < GameConfig.TerrainMinBoundaries.x)
+        {
             movementProperties.Direction.x = -1 * movementProperties.Direction.x;
         }
-        
+
         if (position.z > GameConfig.TerrainMaxBoundaries.y || position.z < GameConfig.TerrainMinBoundaries.y)
         {
             movementProperties.Direction.z = -1 * movementProperties.Direction.z;

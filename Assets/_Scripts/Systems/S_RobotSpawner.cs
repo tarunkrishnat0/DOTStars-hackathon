@@ -31,7 +31,7 @@ public partial struct S_RobotSpawner : ISystem
         
         var ecb = SystemAPI.GetSingleton<BeginInitializationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(state.WorldUnmanaged);
 
-        for(int i = 0; i < spawnerConfig.NumberOfRobotsToSpawn; i++)
+        for(int index = 0; index < spawnerConfig.NumberOfRobotsToSpawn; index++)
         {
             var entity = ecb.Instantiate(spawnerConfig.Prefab);
             var position = random.ValueRW.random.NextFloat3(gameConfig.TerrainMinBoundaries.x, gameConfig.TerrainMaxBoundaries.x);
@@ -42,8 +42,22 @@ public partial struct S_RobotSpawner : ISystem
                 Rotation = quaternion.LookRotation(position, math.up()),
                 Scale = 1,
             });
-            
-            ecb.AddComponent<T_Robot>(entity);
+
+            SpawnCategory spawnCategory;
+            if (index % 3 == 0)
+            {
+                spawnCategory = SpawnCategory.ROBOT_CATEGORY_1;
+            }
+            else if(index % 3 == 1)
+            {
+                spawnCategory = SpawnCategory.ROBOT_CATEGORY_2;
+            }
+            else
+            {
+                spawnCategory = SpawnCategory.ROBOT_CATEGORY_3;
+            }
+
+            ecb.AddComponent(entity, new T_Robot() { spawnCategory = spawnCategory });
             ecb.AddComponent<URPMaterialPropertyBaseColor>(entity);
             ecb.AddComponent<URPMaterialPropertyEmissionColor>(entity);
 
