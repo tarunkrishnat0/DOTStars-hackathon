@@ -1,0 +1,5 @@
+[mergetool "unityyamlmerge"]
+    trustExitCode = false
+    keepBackup = false
+    # Replace path with path to your Unity version!
+    cmd = 'C:/Program Files/Unity/Hub/Editor/2022.2.0f1/Editor/Data/Tools/UnityYAMLMerge.exe' merge -p \"$BASE\" \"$REMOTE\" \"$LOCAL\" \"$MERGED\"
