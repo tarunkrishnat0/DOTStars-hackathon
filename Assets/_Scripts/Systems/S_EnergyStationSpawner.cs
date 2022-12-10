@@ -32,7 +32,7 @@ public partial struct S_EnergyStationSpawner : ISystem
         {
             var entity = ecb.Instantiate(energyStationConfig.Prefab);
             var position = random.ValueRW.random.NextFloat3(gameConfig.TerrainMinBoundaries.x, gameConfig.TerrainMaxBoundaries.x);
-            position.y = 2.5f;
+            position.y = 0f;
             ecb.SetComponent(entity, new LocalTransform()
             {
                 Position = position,
@@ -44,6 +44,14 @@ public partial struct S_EnergyStationSpawner : ISystem
             var color = (UnityEngine.Vector4)Utilities.RandomColor(random.ValueRW.random.NextFloat(0f, 1f));
             ecb.AddComponent(entity, new URPMaterialPropertyBaseColor() { Value = color });
             ecb.AddComponent(entity, new URPMaterialPropertyEmissionColor() { Value = color });
+
+            position.y = 0f;
+            var direction = math.normalize(position);
+            ecb.AddComponent(entity, new C_EnergyStationMovementProperties()
+            {
+                Direction = direction,
+                Speed = random.ValueRW.random.NextFloat(energyStationConfig.MinSpeed, energyStationConfig.MaxSpeed),
+            });
         }
 
         //ecb.Playback(state.EntityManager);
