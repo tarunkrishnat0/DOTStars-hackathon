@@ -30,8 +30,6 @@ public partial struct S_RobotSpawner : ISystem
         var spawnerConfig = SystemAPI.GetSingleton<C_RobotSpawnerConfig>();
         var gameConfig = SystemAPI.GetSingleton<C_GameConfig>();
         var random = SystemAPI.GetSingletonRW<C_GameRandom>();
-
-        // var ecb = new EntityCommandBuffer(Unity.Collections.Allocator.Temp);
         
         var ecb = SystemAPI.GetSingleton<BeginInitializationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(state.WorldUnmanaged);
 
@@ -41,7 +39,6 @@ public partial struct S_RobotSpawner : ISystem
         void SpawnRobot(float3 position, SpawnCategory spawnCategory)
         {
             var entity = ecb.Instantiate(spawnerConfig.Prefab);
-
             ecb.SetComponent(entity, new LocalTransform()
             {
                 Position = position,
@@ -84,7 +81,6 @@ public partial struct S_RobotSpawner : ISystem
             SpawnRobot(position, spawnCategory);
         }
 
-        //state.CompleteDependency();
 
         spawnCategory = EnergySystemAndRobotSpawnCtrl.instance.getSelectedSpawnCategory();
         if (spawnCategory == SpawnCategory.ENERGY_SYSTEM)
@@ -108,6 +104,23 @@ public partial struct S_RobotSpawner : ISystem
                 }
             }
             inputs.Clear();
+        }
+
+        //ToDo: Is this needed or not?
+        //state.CompleteDependency();
+
+        // Set Colors
+        foreach (var (hatProperties, entity) in SystemAPI.Query<C_RobotFooterProperties>().WithEntityAccess())
+        {
+            var spawnCategory1 = state.EntityManager.GetComponentData<T_Robot>(hatProperties.Parent).spawnCategory;
+            //Debug.Log("spawnCategory1 : " + spawnCategory1.ToString());
+            Color color = spawnCategory1 switch
+            {
+                SpawnCategory.ROBOT_CATEGORY_1 => Color.red,
+                SpawnCategory.ROBOT_CATEGORY_2 => Color.green,
+                SpawnCategory.ROBOT_CATEGORY_3 => Color.blue
+            };
+            state.EntityManager.SetComponentData(entity, new URPMaterialPropertyBaseColor() { Value = (Vector4)color });
         }
     }
 }

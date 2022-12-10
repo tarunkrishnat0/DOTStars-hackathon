@@ -1,17 +1,17 @@
 # Problem Statement
 Input:
-- [ ] Spawn `N` number of Robots(capsules) at start per category.
+- [x] Spawn `N` number of Robots(capsules) at start per category.
 - [x] Spawn `M` number of EnergyStations(spheres) at start.
 - [ ] Option in UI for user to choose the spawn category - robots/energyStation.
 - [ ] Spawn Robot/EnergyStation in the position where user clicks.
 - [ ] Spawn Robot/EnergyStation in random positions if user chosses random position spawn.
 
 Conditions:
-- [ ] On EnergyStation spawn, it starts moving in a random direction with random speed.
+- [x] On EnergyStation spawn, it starts moving in a random direction with random speed.
 - [x] On Robot Spawn, its speed is randomly decided but it always towards the nearest energy point.
 - [x] Robots color change based on their closeness to the energy point.
 - [x] On hitting the boundary, Robots get reflected.
-- [ ] On hitting the boundary, EnergyStations get reflected.
+- [x] On hitting the boundary, EnergyStations get reflected.
 - [ ] EnergyStation capacity drops when a robot comes near it
 
 Termination:
