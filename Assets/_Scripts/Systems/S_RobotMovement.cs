@@ -94,9 +94,9 @@ public partial struct RobotMovementJob : IJobEntity
             baseColor.Value = new Vector4(finalColor.x, finalColor.y, finalColor.z, 1);
             emissionColor.Value = baseColor.Value;
 
-            if (robotTag.spawnCategory == SpawnCategory.ROBOT_CATEGORY_3 ||
-                (robotTag.spawnCategory == SpawnCategory.ROBOT_CATEGORY_2 && System.DateTime.Now.Second % 3 == 0) ||
-                (robotTag.spawnCategory == SpawnCategory.ROBOT_CATEGORY_1 && System.DateTime.Now.Second % 7 == 0))
+            if (robotTag.spawnCategory == SpawnCategory.SMART_ROBOT ||
+                (robotTag.spawnCategory == SpawnCategory.SEMI_SMART_ROBOT && System.DateTime.Now.Second % 3 == 0) ||
+                (robotTag.spawnCategory == SpawnCategory.DUMB_ROBOT && System.DateTime.Now.Second % 7 == 0))
             {
                 movementProperties.Direction = directionTowardsNearestEnergyStation;
             }

@@ -65,8 +65,8 @@ public partial struct EnergyStationHealthJob : IJobEntity
 
         if (PhysicsWorld.OverlapSphere(transform.LocalPosition, 2.1f, ref distances, filter))
         {
-            //Debug.Log("EnergyStation collision : " + distances.Length);
-            energyStationHealthProperty.EnergyStationHealth -= distances.Length* 0.5f;
+            // Debug.Log("EnergyStation collision : " + distances.Length);
+            energyStationHealthProperty.EnergyStationHealth -= (distances.Length-1)* 0.5f;
         }
     }
 }

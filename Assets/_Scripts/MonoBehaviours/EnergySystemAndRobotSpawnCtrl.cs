@@ -6,9 +6,9 @@ using UnityEngine.UI;
 
 public enum SpawnCategory
 {
-    ROBOT_CATEGORY_1,
-    ROBOT_CATEGORY_2,
-    ROBOT_CATEGORY_3,
+    DUMB_ROBOT,
+    SEMI_SMART_ROBOT,
+    SMART_ROBOT,
     ENERGY_SYSTEM
 }
 
@@ -48,9 +48,9 @@ public class EnergySystemAndRobotSpawnCtrl : MonoBehaviour
     private void populateSpawnCategoryList()
     {
         spawnCategoryDropDown.options.Clear();
-        spawnCategoryDropDown.options.Add(new TMP_Dropdown.OptionData() { text = SpawnCategory.ROBOT_CATEGORY_1.ToString() });
-        spawnCategoryDropDown.options.Add(new TMP_Dropdown.OptionData() { text = SpawnCategory.ROBOT_CATEGORY_2.ToString() });
-        spawnCategoryDropDown.options.Add(new TMP_Dropdown.OptionData() { text = SpawnCategory.ROBOT_CATEGORY_3.ToString() });
+        spawnCategoryDropDown.options.Add(new TMP_Dropdown.OptionData() { text = "<color=\"red\">" + SpawnCategory.DUMB_ROBOT.ToString() + "</color>" });
+        spawnCategoryDropDown.options.Add(new TMP_Dropdown.OptionData() { text = "<color=\"green\">" + SpawnCategory.SEMI_SMART_ROBOT.ToString() + "</color>" });
+        spawnCategoryDropDown.options.Add(new TMP_Dropdown.OptionData() { text = "<color=\"blue\">" + SpawnCategory.SMART_ROBOT.ToString() + "</color>" });
         spawnCategoryDropDown.options.Add(new TMP_Dropdown.OptionData() { text = SpawnCategory.ENERGY_SYSTEM.ToString() });
 
         spawnCategoryDropDown.value = 2;
@@ -66,29 +66,38 @@ public class EnergySystemAndRobotSpawnCtrl : MonoBehaviour
 
     public SpawnCategory getSelectedSpawnCategory()
     {
-        SpawnCategory spawnCategory;
-        Enum.TryParse<SpawnCategory>(spawnCategoryDropDown.options[spawnCategoryDropDown.value].text, out spawnCategory);
-        return spawnCategory;
+        // SpawnCategory spawnCategory;
+        // Enum.TryParse<SpawnCategory>(spawnCategoryDropDown.options[spawnCategoryDropDown.value].text, out spawnCategory);
+        // return spawnCategory;
+        string category = spawnCategoryDropDown.options[spawnCategoryDropDown.value].text;
+        if (category.Contains(SpawnCategory.DUMB_ROBOT.ToString()))
+            return SpawnCategory.DUMB_ROBOT;
+        else if (category.Contains(SpawnCategory.SEMI_SMART_ROBOT.ToString()))
+            return SpawnCategory.SEMI_SMART_ROBOT;
+        else if (category.Contains(SpawnCategory.SMART_ROBOT.ToString()))
+            return SpawnCategory.SMART_ROBOT;
+        else
+            return SpawnCategory.ENERGY_SYSTEM;
     }
 
     private void onClickOfRandomSpawnButtonForCategory1Robots()
     {
-        numberOfCategory1RobotsToSpawn = GetRobotsCount(SpawnCategory.ROBOT_CATEGORY_1) + 50;
+        numberOfCategory1RobotsToSpawn = GetRobotsCount(SpawnCategory.DUMB_ROBOT) + 50;
     }
 
     private void onClickOfRandomSpawnButtonForCategory2Robots()
     {
-        numberOfCategory2RobotsToSpawn = GetRobotsCount(SpawnCategory.ROBOT_CATEGORY_2) + 50;
+        numberOfCategory2RobotsToSpawn = GetRobotsCount(SpawnCategory.SEMI_SMART_ROBOT) + 50;
     }
 
     private void onClickOfRandomSpawnButtonForCategory3Robots()
     {
-        numberOfCategory3RobotsToSpawn = GetRobotsCount(SpawnCategory.ROBOT_CATEGORY_3) + 50;
+        numberOfCategory3RobotsToSpawn = GetRobotsCount(SpawnCategory.SMART_ROBOT) + 50;
     }
 
     private void onClickOfRandomSpawnButtonForEnergySystems()
     {
-        numberOfEnergySystemsToSpawn += 5;
+        numberOfEnergySystemsToSpawn = GetEnergyStationsCount() + 5;
     }
 
     private int GetRobotsCount(SpawnCategory spawnCategory)
@@ -100,6 +109,17 @@ public class EnergySystemAndRobotSpawnCtrl : MonoBehaviour
 
         EntityQuery query = _world.EntityManager.CreateEntityQuery(ComponentType.ReadOnly(typeof(T_Robot)));
         query.AddSharedComponentFilter(new T_Robot() { spawnCategory = spawnCategory });
+        return query.CalculateEntityCount();
+    }
+
+    private int GetEnergyStationsCount()
+    {
+        if (_world == null)
+        {
+            _world = World.DefaultGameObjectInjectionWorld;
+        }
+
+        EntityQuery query = _world.EntityManager.CreateEntityQuery(ComponentType.ReadOnly(typeof(T_EnergyStation)));
         return query.CalculateEntityCount();
     }
 }

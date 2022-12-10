@@ -31,8 +31,10 @@ public partial struct S_EnergyStationSpawner : ISystem
         var query = SystemAPI.QueryBuilder().WithAll<T_EnergyStation>().Build();
         var energySystemsCount = query.CalculateEntityCount();
 
-        int totalNumberOfEnergySystemsToSpawn = energyStationConfig.NumberOfEnergyStationsToSpawn + 
-            EnergySystemAndRobotSpawnCtrl.instance.numberOfEnergySystemsToSpawn;
+        //ToDo: How to use UnityEngineComponent?
+        //var count = SystemAPI.ManagedAPI.UnityEngineComponent<EnergySystemAndRobotSpawnCtrl.instance>();
+
+        int totalNumberOfEnergySystemsToSpawn = EnergySystemAndRobotSpawnCtrl.instance.numberOfEnergySystemsToSpawn;
         for (int i = energySystemsCount; i < totalNumberOfEnergySystemsToSpawn; i++)
         {
             var position = Utilities.GetRandomPositionInGrid(random, gameConfig.TerrainMinBoundaries.x, gameConfig.TerrainMaxBoundaries.x);
@@ -61,10 +63,6 @@ public partial struct S_EnergyStationSpawner : ISystem
                 }
             }
             inputs.Clear();
-
-
         }
-
-        // state.Enabled = false;
     }
 }
