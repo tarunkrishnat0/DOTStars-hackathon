@@ -24,6 +24,7 @@ public partial struct S_RobotSpawner : ISystem
     {
     }
 
+    //ToDo: Enabling Burst Compile is causing build issues.
     //[BurstCompile]
     public void OnUpdate(ref SystemState state)
     {

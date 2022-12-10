@@ -40,8 +40,10 @@ public class EnergySystemAndRobotSpawnCtrl : MonoBehaviour
             _entity = _world.EntityManager.CreateEntity();
             _world.EntityManager.AddComponent<C_CurrentSpawnCategoryOfMouseClick>(_entity);
             _world.EntityManager.AddComponent<C_RobotsSpawnCount>(_entity);
+            _world.EntityManager.AddComponent<C_EnergyStationsSpawnCount>(_entity);
         }
         SetRobotSpawnCountInConfig();
+        SetEnergyStationSpawnCountInConfig();
 
         populateSpawnCategoryList();
         addButtonListeners();
@@ -53,12 +55,11 @@ public class EnergySystemAndRobotSpawnCtrl : MonoBehaviour
         spawnCategoryDropDown.options.Add(new TMP_Dropdown.OptionData() { text = "<color=\"red\">" + SpawnCategory.DUMB_ROBOT.ToString() + "</color>" });
         spawnCategoryDropDown.options.Add(new TMP_Dropdown.OptionData() { text = "<color=\"green\">" + SpawnCategory.SEMI_SMART_ROBOT.ToString() + "</color>" });
         spawnCategoryDropDown.options.Add(new TMP_Dropdown.OptionData() { text = "<color=\"blue\">" + SpawnCategory.SMART_ROBOT.ToString() + "</color>" });
-        //spawnCategoryDropDown.options.Add(new TMP_Dropdown.OptionData() { text = SpawnCategory.ENERGY_SYSTEM.ToString() });
+        spawnCategoryDropDown.options.Add(new TMP_Dropdown.OptionData() { text = SpawnCategory.ENERGY_SYSTEM.ToString() });
 
         spawnCategoryDropDown.onValueChanged.RemoveAllListeners();
         spawnCategoryDropDown.onValueChanged.AddListener(Dropdown_OnValueChanged);
         spawnCategoryDropDown.value = 2;
-
     }
 
     private void Dropdown_OnValueChanged(int index)
@@ -112,6 +113,7 @@ public class EnergySystemAndRobotSpawnCtrl : MonoBehaviour
     private void onClickOfRandomSpawnButtonForEnergySystems()
     {
         numberOfEnergySystemsToSpawn = GetEnergyStationsCount() + 5;
+        SetEnergyStationSpawnCountInConfig();
     }
 
     private int GetRobotsCount(SpawnCategory spawnCategory)
@@ -133,6 +135,14 @@ public class EnergySystemAndRobotSpawnCtrl : MonoBehaviour
             NumberOfDumbRobotsToSpawn = numberOfDumbRobotsToSpawn,
             NumberOfSemiSmartRobotsToSpawn = numberOfSemiSmartRobotsToSpawn,
             NumberOfSmartRobotsToSpawn = numberOfSmartRobotsToSpawn,
+        });
+    }
+
+    private void SetEnergyStationSpawnCountInConfig()
+    {
+        _world.EntityManager.SetComponentData(_entity, new C_EnergyStationsSpawnCount()
+        {
+            NumberOfEnergyStationsToSpawn = numberOfEnergySystemsToSpawn,
         });
     }
 

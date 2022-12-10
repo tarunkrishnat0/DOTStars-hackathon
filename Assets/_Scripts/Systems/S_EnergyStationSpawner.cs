@@ -23,6 +23,7 @@ public partial struct S_EnergyStationSpawner : ISystem
     public void OnUpdate(ref SystemState state)
     {
         var energyStationConfig = SystemAPI.GetSingleton<C_EnergyStationSpawnerConfig>();
+        var energyStationSpawn = SystemAPI.GetSingleton<C_EnergyStationsSpawnCount>();
         var gameConfig = SystemAPI.GetSingleton<C_GameConfig>();
         var random = SystemAPI.GetSingletonRW<C_GameRandom>();
 
@@ -34,7 +35,7 @@ public partial struct S_EnergyStationSpawner : ISystem
         //ToDo: How to use UnityEngineComponent?
         //var count = SystemAPI.ManagedAPI.UnityEngineComponent<EnergySystemAndRobotSpawnCtrl.instance>();
 
-        int totalNumberOfEnergySystemsToSpawn = energyStationConfig.NumberOfEnergyStationsToSpawn;// EnergySystemAndRobotSpawnCtrl.Instance.numberOfEnergySystemsToSpawn;
+        int totalNumberOfEnergySystemsToSpawn = energyStationSpawn.NumberOfEnergyStationsToSpawn;
         for (int i = energySystemsCount; i < totalNumberOfEnergySystemsToSpawn; i++)
         {
             var position = Utilities.GetRandomPositionInGrid(random, gameConfig.TerrainMinBoundaries.x, gameConfig.TerrainMaxBoundaries.x);

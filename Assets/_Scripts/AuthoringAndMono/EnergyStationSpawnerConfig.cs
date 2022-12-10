@@ -5,7 +5,6 @@ using UnityEngine;
 public class EnergyStationSpawnerConfig : MonoBehaviour
 {
 	public GameObject EnergyStation;
-	public int NumberOfEnergyStationsToSpawn;
 	public float MaxSpeed;
 	public float MinSpeed;
 	public float EnergyStationHealth;
@@ -20,7 +19,6 @@ public class EnergyStationSpawnerConfig : MonoBehaviour
 			AddComponent(new C_EnergyStationSpawnerConfig()
 			{
 				Prefab = GetEntity(authoring.EnergyStation),
-				NumberOfEnergyStationsToSpawn = authoring.NumberOfEnergyStationsToSpawn,
 				MaxSpeed = authoring.MaxSpeed,
 				MinSpeed = authoring.MinSpeed,
 				EnergyStationHealth = authoring.EnergyStationHealth,
