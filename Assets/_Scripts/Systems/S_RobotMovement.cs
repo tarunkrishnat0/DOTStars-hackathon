@@ -1,5 +1,6 @@
 using Unity.Burst;
 using Unity.Entities;
+using Unity.Mathematics;
 using Unity.Transforms;
 
 [UpdateInGroup(typeof(SimulationSystemGroup))]
@@ -10,16 +11,22 @@ public partial struct S_RobotMovement : ISystem
     public void OnCreate(ref SystemState state)
     {
     }
+
     [BurstCompile]
     public void OnDestroy(ref SystemState state)
     {
     }
+
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
+        var gameConfig = SystemAPI.GetSingleton<C_GameConfig>();
         var deltaTime = SystemAPI.Time.DeltaTime;
 
-        new RobotMovementJob() { DeltaTime = deltaTime }.ScheduleParallel();
+        new RobotMovementJob() {
+            DeltaTime = deltaTime,
+            GameConfig = gameConfig,
+        }.ScheduleParallel();
     }
 }
 
@@ -28,10 +35,23 @@ public partial struct S_RobotMovement : ISystem
 public partial struct RobotMovementJob : IJobEntity
 {
     public float DeltaTime;
+    public C_GameConfig GameConfig;
 
     [BurstCompile]
-    public void Execute(ref TransformAspect transform, in C_RobotMovementProperties movementProperties)
+    public void Execute(ref TransformAspect transform, ref C_RobotMovementProperties movementProperties)
     {
+        var position = transform.LocalPosition + movementProperties.Direction * movementProperties.Speed * DeltaTime;
+
+        if (position.x > GameConfig.TerrainMaxBoundaries.x || position.x < GameConfig.TerrainMinBoundaries.x) {
+            movementProperties.Direction.x = -1 * movementProperties.Direction.x;
+        }
+        
+        if (position.z > GameConfig.TerrainMaxBoundaries.y || position.z < GameConfig.TerrainMinBoundaries.y)
+        {
+            movementProperties.Direction.z = -1 * movementProperties.Direction.z;
+        }
+
         transform.LocalPosition += movementProperties.Direction * movementProperties.Speed * DeltaTime;
+        transform.LocalRotation = quaternion.LookRotation(movementProperties.Direction, math.up());
     }
 }
