@@ -38,6 +38,8 @@ public partial struct S_EnergyStationSpawner : ISystem
                 Rotation = quaternion.LookRotation(position, math.up()),
                 Scale = 5,
             });
+
+            ecb.AddComponent<T_EnergyStation>(entity);
         }
 
         //ecb.Playback(state.EntityManager);

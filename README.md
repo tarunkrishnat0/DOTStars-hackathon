@@ -1,12 +1,12 @@
 # Problem Statement
 Input:
 - [x] Spawn `N` number of Robots(capsules) at start.
-- [ ] Spawn `M` number of EnergyStations(spheres) at start.
+- [x] Spawn `M` number of EnergyStations(spheres) at start.
 - [ ] Spawn EnergyStation based on the user clicks.
 
 Conditions:
 - [ ] On EnergyStation spawn, it starts moving in a random direction with random speed.
-- [ ] On Robot Spawn, its speed is randomly decided but it always towards the nearest energy point.
+- [x] On Robot Spawn, its speed is randomly decided but it always towards the nearest energy point.
 - [ ] Robots color change based on their closeness to the energy point.
 - [ ] On hitting the boundary, Robots and EnergyStations get reflected.
 
