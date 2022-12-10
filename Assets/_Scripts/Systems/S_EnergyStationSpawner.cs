@@ -32,7 +32,7 @@ public partial struct S_EnergyStationSpawner : ISystem
         {
             var entity = ecb.Instantiate(energyStationConfig.Prefab);
             var position = random.ValueRW.random.NextFloat3(gameConfig.TerrainMinBoundaries.x, gameConfig.TerrainMaxBoundaries.x);
-            position.y = 1f;
+            position.y = 2.5f;
             ecb.SetComponent(entity, new LocalTransform()
             {
                 Position = position,
