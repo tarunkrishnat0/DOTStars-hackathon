@@ -39,6 +39,8 @@ public class EnergySystemAndRobotSpawnCtrl : MonoBehaviour
         spawnCategoryDropDown.options.Add(new TMP_Dropdown.OptionData() { text = SpawnCategory.ROBOT_CATEGORY_2.ToString() });
         spawnCategoryDropDown.options.Add(new TMP_Dropdown.OptionData() { text = SpawnCategory.ROBOT_CATEGORY_3.ToString() });
         spawnCategoryDropDown.options.Add(new TMP_Dropdown.OptionData() { text = SpawnCategory.ENERGY_SYSTEM.ToString() });
+
+        spawnCategoryDropDown.value = 2;
     }
 
     public SpawnCategory getSelectedSpawnCategory()
