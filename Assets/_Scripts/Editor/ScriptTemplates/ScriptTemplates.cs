@@ -9,7 +9,7 @@ namespace WaynGroup.Mgm.Ability.Editor
         public static void CreateUnmanagedSystem()
         {
             ProjectWindowUtil.CreateScriptAssetFromTemplateFile(
-                $"Assets/Editor/ScriptTemplates/UnmanagedSystem.txt",
+                $"Assets/_Scripts/Editor/ScriptTemplates/UnmanagedSystem.txt",
                 "UnmanagedSystem.cs");
         }
 
@@ -17,7 +17,7 @@ namespace WaynGroup.Mgm.Ability.Editor
         public static void CreateAuthoringComponent()
         {
             ProjectWindowUtil.CreateScriptAssetFromTemplateFile(
-                $"Assets/Editor/ScriptTemplates/AuthoringComponent.txt",
+                $"Assets/_Scripts/Editor/ScriptTemplates/AuthoringComponent.txt",
                 "AuthoringComponent.cs");
         }
 
@@ -25,21 +25,21 @@ namespace WaynGroup.Mgm.Ability.Editor
         public static void CreateIComponentData()
         {
             ProjectWindowUtil.CreateScriptAssetFromTemplateFile(
-                $"Assets/Editor/ScriptTemplates/IComponentData.txt",
+                $"Assets/_Scripts/Editor/ScriptTemplates/IComponentData.txt",
                 "IComponentData.cs");
         }
         [MenuItem("Assets/Create/DOTS/IBufferElementData")]
         public static void CreateIBufferElementData()
         {
             ProjectWindowUtil.CreateScriptAssetFromTemplateFile(
-                $"Assets/Editor/ScriptTemplates/IBufferElementData.txt",
+                $"Assets/_Scripts/Editor/ScriptTemplates/IBufferElementData.txt",
                 "IBufferElementData.cs");
         }
         [MenuItem("Assets/Create/DOTS/Hybrid Component")]
         public static void CreateHybridComponent()
         {
             ProjectWindowUtil.CreateScriptAssetFromTemplateFile(
-                $"Assets/Editor/ScriptTemplates/HybridComponent.txt",
+                $"Assets/_Scripts/Editor/ScriptTemplates/HybridComponent.txt",
                 "HybridComponent.cs");
         }
 
