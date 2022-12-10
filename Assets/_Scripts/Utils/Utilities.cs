@@ -25,7 +25,7 @@ public class Utilities
         return position;
     }
 
-    public static void SpawnEnergyStation(Entity prefab, float3 position, EntityCommandBuffer ecb, RefRW<C_GameRandom> random, float minSpeed, float maxSpeed)
+    public static void SpawnEnergyStation(Entity prefab, float3 position, EntityCommandBuffer ecb, RefRW<C_GameRandom> random, float minSpeed, float maxSpeed, float health)
     {
         var entity = ecb.Instantiate(prefab);
 
@@ -48,5 +48,8 @@ public class Utilities
             Direction = direction,
             Speed = random.ValueRW.random.NextFloat(minSpeed, maxSpeed),
         });
+
+        ecb.AddComponent(entity, new C_EnergyStationHealthProperty() { EnergyStationHealth = health });
+
     }
 }

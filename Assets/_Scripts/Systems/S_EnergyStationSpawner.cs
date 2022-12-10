@@ -36,7 +36,7 @@ public partial struct S_EnergyStationSpawner : ISystem
         for (int i = energySystemsCount; i < totalNumberOfEnergySystemsToSpawn; i++)
         {
             var position = Utilities.GetRandomPositionInGrid(random, gameConfig.TerrainMinBoundaries.x, gameConfig.TerrainMaxBoundaries.x);
-            Utilities.SpawnEnergyStation(energyStationConfig.Prefab, position, ecb, random, energyStationConfig.MinSpeed, energyStationConfig.MaxSpeed);
+            Utilities.SpawnEnergyStation(energyStationConfig.Prefab, position, ecb, random, energyStationConfig.MinSpeed, energyStationConfig.MaxSpeed, energyStationConfig.EnergyStationHealth);
         }
 
         SpawnCategory spawnCategory = EnergySystemAndRobotSpawnCtrl.instance.getSelectedSpawnCategory();
@@ -56,11 +56,13 @@ public partial struct S_EnergyStationSpawner : ISystem
                     NativeList<DistanceHit> distances = new NativeList<DistanceHit>(Allocator.Temp);
                     if (!physicsWorld.OverlapSphere(position + math.up(), 0.1f, ref distances, CollisionFilter.Default))
                     {
-                        Utilities.SpawnEnergyStation(energyStationConfig.Prefab, position, ecb, random, energyStationConfig.MinSpeed, energyStationConfig.MaxSpeed);
+                        Utilities.SpawnEnergyStation(energyStationConfig.Prefab, position, ecb, random, energyStationConfig.MinSpeed, energyStationConfig.MaxSpeed, energyStationConfig.EnergyStationHealth);
                     }
                 }
             }
             inputs.Clear();
+
+
         }
 
         // state.Enabled = false;
