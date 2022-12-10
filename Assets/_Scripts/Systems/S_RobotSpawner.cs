@@ -83,27 +83,25 @@ public partial struct S_RobotSpawner : ISystem
 
 
         spawnCategory = EnergySystemAndRobotSpawnCtrl.instance.getSelectedSpawnCategory();
-        if (spawnCategory == SpawnCategory.ENERGY_SYSTEM)
+        if (spawnCategory != SpawnCategory.ENERGY_SYSTEM)
         {
-            return;
-        }
-
-        PhysicsWorldSingleton physicsWorld = SystemAPI.GetSingleton<PhysicsWorldSingleton>();
-        foreach (var inputs in SystemAPI.Query<DynamicBuffer<C_MouseClicksBuffer>>())
-        {
-            foreach (var input in inputs)
+            PhysicsWorldSingleton physicsWorld = SystemAPI.GetSingleton<PhysicsWorldSingleton>();
+            foreach (var inputs in SystemAPI.Query<DynamicBuffer<C_MouseClicksBuffer>>())
             {
-                if (physicsWorld.CastRay(input.Value, out var hit))
+                foreach (var input in inputs)
                 {
-                    var position = math.round(hit.Position) + math.up();
-                    NativeList<DistanceHit> distances = new NativeList<DistanceHit>(Allocator.Temp);
-                    if (!physicsWorld.OverlapSphere(position + math.up(), 0.1f, ref distances, CollisionFilter.Default))
+                    if (physicsWorld.CastRay(input.Value, out var hit))
                     {
-                        SpawnRobot(position, spawnCategory);
+                        var position = math.round(hit.Position) + math.up();
+                        NativeList<DistanceHit> distances = new NativeList<DistanceHit>(Allocator.Temp);
+                        if (!physicsWorld.OverlapSphere(position + math.up(), 0.1f, ref distances, CollisionFilter.Default))
+                        {
+                            SpawnRobot(position, spawnCategory);
+                        }
                     }
                 }
+                inputs.Clear();
             }
-            inputs.Clear();
         }
 
         //ToDo: Is this needed or not?

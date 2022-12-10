@@ -13,6 +13,7 @@ public partial struct S_RobotMovement : ISystem
     [BurstCompile]
     public void OnCreate(ref SystemState state)
     {
+        state.RequireForUpdate<C_GameConfig>();
     }
 
     [BurstCompile]
