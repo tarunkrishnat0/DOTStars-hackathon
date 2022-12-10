@@ -52,6 +52,9 @@ public partial struct S_EnergyStationSpawner : ISystem
                 Direction = direction,
                 Speed = random.ValueRW.random.NextFloat(energyStationConfig.MinSpeed, energyStationConfig.MaxSpeed),
             });
+
+            ecb.AddComponent(entity, new C_EnergyStationHealthProperty() { EnergyStationHealth = energyStationConfig.EnergyStationHealth });
+
         }
 
         //ecb.Playback(state.EntityManager);

@@ -60,41 +60,45 @@ public partial struct RobotMovementJob : IJobEntity
         float maxDistance = 100f * math.sqrt(2);
         float minDistance = float.MaxValue;
         int nearestEnergyStationIndex = 0;
-        for (int i = 0; i < EnergyStationTransforms.Length; i++)
+
+        if (EnergyStationTransforms.Length > 0)
         {
-            float distance = math.distance(EnergyStationTransforms[i].Position, transform.LocalPosition);
-            if (distance < minDistance)
+            for (int i = 0; i < EnergyStationTransforms.Length; i++)
             {
-                nearestEnergyStationIndex = i;
-                minDistance = distance;
+                float distance = math.distance(EnergyStationTransforms[i].Position, transform.LocalPosition);
+                if (distance < minDistance)
+                {
+                    nearestEnergyStationIndex = i;
+                    minDistance = distance;
+                }
             }
-        }
 
-        if (math.distance(EnergyStationTransforms[nearestEnergyStationIndex].Position, transform.LocalPosition) < 2)
-        {
-            ECB.DestroyEntity(sortKey, entity);
-            return;
-        }
+            if (math.distance(EnergyStationTransforms[nearestEnergyStationIndex].Position, transform.LocalPosition) < 2)
+            {
+                ECB.DestroyEntity(sortKey, entity);
+                return;
+            }
 
-        float3 directionTowardsNearestEnergyStation = EnergyStationTransforms[nearestEnergyStationIndex].Position - transform.LocalPosition;
-        directionTowardsNearestEnergyStation.y = 0;
-        directionTowardsNearestEnergyStation = math.normalize(directionTowardsNearestEnergyStation);
+            float3 directionTowardsNearestEnergyStation = EnergyStationTransforms[nearestEnergyStationIndex].Position - transform.LocalPosition;
+            directionTowardsNearestEnergyStation.y = 0;
+            directionTowardsNearestEnergyStation = math.normalize(directionTowardsNearestEnergyStation);
 
-        float currentDistance = math.distance(EnergyStationTransforms[nearestEnergyStationIndex].Position, transform.LocalPosition);
-        float closenessfactor = (maxDistance - currentDistance) / maxDistance;
+            float currentDistance = math.distance(EnergyStationTransforms[nearestEnergyStationIndex].Position, transform.LocalPosition);
+            float closenessfactor = (maxDistance - currentDistance) / maxDistance;
 
-        var energyStationTempColor = EneryStationColors[nearestEnergyStationIndex].Value;
-        float3 energeStationColor = new float3(energyStationTempColor.x, energyStationTempColor.y, energyStationTempColor.z);
-        float3 finalColor = math.lerp(new float3(1, 1, 1), energeStationColor, closenessfactor);
+            var energyStationTempColor = EneryStationColors[nearestEnergyStationIndex].Value;
+            float3 energeStationColor = new float3(energyStationTempColor.x, energyStationTempColor.y, energyStationTempColor.z);
+            float3 finalColor = math.lerp(new float3(1, 1, 1), energeStationColor, closenessfactor);
 
-        baseColor.Value = new Vector4(finalColor.x, finalColor.y, finalColor.z, 1);
-        emissionColor.Value = baseColor.Value;
+            baseColor.Value = new Vector4(finalColor.x, finalColor.y, finalColor.z, 1);
+            emissionColor.Value = baseColor.Value;
 
-        if (robotTag.spawnCategory == SpawnCategory.ROBOT_CATEGORY_3 ||
-            (robotTag.spawnCategory == SpawnCategory.ROBOT_CATEGORY_2 && System.DateTime.Now.Second % 3 == 0) ||
-            (robotTag.spawnCategory == SpawnCategory.ROBOT_CATEGORY_1 && System.DateTime.Now.Second % 7 == 0))
-        {
-            movementProperties.Direction = directionTowardsNearestEnergyStation;
+            if (robotTag.spawnCategory == SpawnCategory.ROBOT_CATEGORY_3 ||
+                (robotTag.spawnCategory == SpawnCategory.ROBOT_CATEGORY_2 && System.DateTime.Now.Second % 3 == 0) ||
+                (robotTag.spawnCategory == SpawnCategory.ROBOT_CATEGORY_1 && System.DateTime.Now.Second % 7 == 0))
+            {
+                movementProperties.Direction = directionTowardsNearestEnergyStation;
+            }
         }
 
         var position = transform.LocalPosition + movementProperties.Direction * movementProperties.Speed * DeltaTime;
