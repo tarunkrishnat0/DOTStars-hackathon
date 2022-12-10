@@ -30,6 +30,7 @@ Termination:
     - Enable Play Mode Options
 - Packages
 	- com.unity.entities.graphics (1.0.0-pre.15)
+    - com.unity.physics (1.0.0-pre.15)
 
 ## Attributions
 

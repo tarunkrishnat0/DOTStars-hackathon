@@ -1,8 +1,12 @@
 using Unity.Burst;
+using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
+using Unity.Physics;
 using Unity.Rendering;
 using Unity.Transforms;
+using UnityEngine;
+using static UnityEngine.EventSystems.EventTrigger;
 
 [UpdateInGroup(typeof(InitializationSystemGroup))]
 [UpdateAfter(typeof(S_EnergyStationSpawner))]
@@ -31,31 +35,19 @@ public partial struct S_RobotSpawner : ISystem
         
         var ecb = SystemAPI.GetSingleton<BeginInitializationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(state.WorldUnmanaged);
 
-        for(int index = 0; index < spawnerConfig.NumberOfRobotsToSpawn; index++)
+        var query = SystemAPI.QueryBuilder().WithAll<T_Robot>().Build();
+        var robotsCount = query.CalculateEntityCount();
+
+        void SpawnRobot(float3 position, SpawnCategory spawnCategory)
         {
             var entity = ecb.Instantiate(spawnerConfig.Prefab);
-            var position = random.ValueRW.random.NextFloat3(gameConfig.TerrainMinBoundaries.x, gameConfig.TerrainMaxBoundaries.x);
-            position.y = 1f;
+
             ecb.SetComponent(entity, new LocalTransform()
             {
                 Position = position,
                 Rotation = quaternion.LookRotation(position, math.up()),
                 Scale = 1,
             });
-
-            SpawnCategory spawnCategory;
-            if (index % 3 == 0)
-            {
-                spawnCategory = SpawnCategory.ROBOT_CATEGORY_1;
-            }
-            else if(index % 3 == 1)
-            {
-                spawnCategory = SpawnCategory.ROBOT_CATEGORY_2;
-            }
-            else
-            {
-                spawnCategory = SpawnCategory.ROBOT_CATEGORY_3;
-            }
 
             ecb.AddComponent(entity, new T_Robot() { spawnCategory = spawnCategory });
             ecb.AddComponent<URPMaterialPropertyBaseColor>(entity);
@@ -70,9 +62,52 @@ public partial struct S_RobotSpawner : ISystem
             });
         }
 
-        //ecb.Playback(state.EntityManager);
-        //ecb.Dispose();
+        SpawnCategory spawnCategory;
+        for (int index = robotsCount; index < spawnerConfig.NumberOfRobotsToSpawn; index++)
+        {
+            var position = random.ValueRW.random.NextFloat3(gameConfig.TerrainMinBoundaries.x, gameConfig.TerrainMaxBoundaries.x);
+            position.y = 1f;
+             
+            if (index % 3 == 0)
+            {
+                spawnCategory = SpawnCategory.ROBOT_CATEGORY_1;
+            }
+            else if (index % 3 == 1)
+            {
+                spawnCategory = SpawnCategory.ROBOT_CATEGORY_2;
+            }
+            else
+            {
+                spawnCategory = SpawnCategory.ROBOT_CATEGORY_3;
+            }
 
-        state.Enabled = false;
+            SpawnRobot(position, spawnCategory);
+        }
+
+        //state.CompleteDependency();
+
+        spawnCategory = EnergySystemAndRobotSpawnCtrl.instance.getSelectedSpawnCategory();
+        if (spawnCategory == SpawnCategory.ENERGY_SYSTEM)
+        {
+            return;
+        }
+
+        PhysicsWorldSingleton physicsWorld = SystemAPI.GetSingleton<PhysicsWorldSingleton>();
+        foreach (var inputs in SystemAPI.Query<DynamicBuffer<C_MouseClicksBuffer>>())
+        {
+            foreach (var input in inputs)
+            {
+                if (physicsWorld.CastRay(input.Value, out var hit))
+                {
+                    var position = math.round(hit.Position) + math.up();
+                    NativeList<DistanceHit> distances = new NativeList<DistanceHit>(Allocator.Temp);
+                    if (!physicsWorld.OverlapSphere(position + math.up(), 0.1f, ref distances, CollisionFilter.Default))
+                    {
+                        SpawnRobot(position, spawnCategory);
+                    }
+                }
+            }
+            inputs.Clear();
+        }
     }
 }

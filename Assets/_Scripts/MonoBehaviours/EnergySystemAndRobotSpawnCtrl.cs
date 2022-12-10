@@ -15,8 +15,6 @@ public class EnergySystemAndRobotSpawnCtrl : MonoBehaviour
 {
     public static EnergySystemAndRobotSpawnCtrl instance;
 
-    public SpawnCategory spawnCategory;
-
     public Button randomSpawnButton;
     public TMP_Dropdown spawnCategoryDropDown;
 
