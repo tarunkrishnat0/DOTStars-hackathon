@@ -1,8 +1,8 @@
 # Problem Statement
 Input:
-- [ ] Spawn `N` number of Robots(capsules) at start.
-- [ ] Spawn `M` number of EnergyStations(cubes) at start.
-- [ ] Spawn EnergyStation(cubes) based on the user clicks.
+- [x] Spawn `N` number of Robots(capsules) at start.
+- [ ] Spawn `M` number of EnergyStations(spheres) at start.
+- [ ] Spawn EnergyStation based on the user clicks.
 
 Conditions:
 - [ ] On EnergyStation spawn, it starts moving in a random direction with random speed.
@@ -11,7 +11,7 @@ Conditions:
 - [ ] On hitting the boundary, Robots and EnergyStations get reflected.
 
 Termination:
-- [ ] On reaching the target EnergyPoint, Robots will die due to high voltage :dizzy_face:
+- [ ] On reaching the target EnergyStation, Robots will die due to high voltage :dizzy_face:
 
 # Project Settings
 - Unity 2022.2.0f1
@@ -30,3 +30,11 @@ Termination:
 
 - Hackathon Link: https://www.metaversecreators.dev/hackathon/
 - ECS Templates: https://github.com/WAYN-Games/DOTS-Training/tree/DOTS-111/Assets/Editor
+- Textures: https://www.youtube.com/watch?v=IO6_6Y_YUdE
+
+## References
+
+- https://www.youtube.com/watch?v=IO6_6Y_YUdE
+- https://www.youtube.com/watch?v=H7zAORa3Ux0
+- https://www.youtube.com/playlist?list=PL6ubahbodJ3N2udo4n9yGQcpbWnqdgYnL
+- https://github.com/Unity-Technologies/EntityComponentSystemSamples
