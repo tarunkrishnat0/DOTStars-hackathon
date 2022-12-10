@@ -68,8 +68,8 @@ public partial struct S_RobotSpawner : ISystem
             });
         }
 
-        int totalNumberOfCategory1RobotsToSpawn = EnergySystemAndRobotSpawnCtrl.instance.numberOfCategory1RobotsToSpawn +
-            spawnerConfig.NumberOfCategory1RobotsToSpawn;
+        int totalNumberOfCategory1RobotsToSpawn = EnergySystemAndRobotSpawnCtrl.instance.numberOfCategory1RobotsToSpawn;
+        Debug.Log("totalNumberOfCategory1RobotsToSpawn : " + totalNumberOfCategory1RobotsToSpawn + " robotsCat1Count : " + robotsCat1Count);
         for (int index = robotsCat1Count; index < totalNumberOfCategory1RobotsToSpawn; index++)
         {
             var position = random.ValueRW.random.NextFloat3(gameConfig.TerrainMinBoundaries.x, gameConfig.TerrainMaxBoundaries.x);
@@ -77,8 +77,7 @@ public partial struct S_RobotSpawner : ISystem
             SpawnRobot(position, SpawnCategory.ROBOT_CATEGORY_1);
         }
 
-        int totalNumberOfCategory2RobotsToSpawn = EnergySystemAndRobotSpawnCtrl.instance.numberOfCategory2RobotsToSpawn +
-            spawnerConfig.NumberOfCategory2RobotsToSpawn;
+        int totalNumberOfCategory2RobotsToSpawn = EnergySystemAndRobotSpawnCtrl.instance.numberOfCategory2RobotsToSpawn;
         for (int index = robotsCat2Count; index < totalNumberOfCategory2RobotsToSpawn; index++)
         {
             var position = random.ValueRW.random.NextFloat3(gameConfig.TerrainMinBoundaries.x, gameConfig.TerrainMaxBoundaries.x);
@@ -86,8 +85,7 @@ public partial struct S_RobotSpawner : ISystem
             SpawnRobot(position, SpawnCategory.ROBOT_CATEGORY_2);
         }
 
-        int totalNumberOfCategory3RobotsToSpawn = EnergySystemAndRobotSpawnCtrl.instance.numberOfCategory3RobotsToSpawn +
-            spawnerConfig.NumberOfCategory3RobotsToSpawn;
+        int totalNumberOfCategory3RobotsToSpawn = EnergySystemAndRobotSpawnCtrl.instance.numberOfCategory3RobotsToSpawn;
         for (int index = robotsCat3Count; index < totalNumberOfCategory3RobotsToSpawn; index++)
         {
             var position = random.ValueRW.random.NextFloat3(gameConfig.TerrainMinBoundaries.x, gameConfig.TerrainMaxBoundaries.x);
@@ -96,27 +94,25 @@ public partial struct S_RobotSpawner : ISystem
         }
 
         SpawnCategory spawnCategory = EnergySystemAndRobotSpawnCtrl.instance.getSelectedSpawnCategory();
-        if (spawnCategory == SpawnCategory.ENERGY_SYSTEM)
+        if (spawnCategory != SpawnCategory.ENERGY_SYSTEM)
         {
-            return;
-        }
-
-        PhysicsWorldSingleton physicsWorld = SystemAPI.GetSingleton<PhysicsWorldSingleton>();
-        foreach (var inputs in SystemAPI.Query<DynamicBuffer<C_MouseClicksBuffer>>())
-        {
-            foreach (var input in inputs)
+            PhysicsWorldSingleton physicsWorld = SystemAPI.GetSingleton<PhysicsWorldSingleton>();
+            foreach (var inputs in SystemAPI.Query<DynamicBuffer<C_MouseClicksBuffer>>())
             {
-                if (physicsWorld.CastRay(input.Value, out var hit))
+                foreach (var input in inputs)
                 {
-                    var position = math.round(hit.Position) + math.up();
-                    NativeList<DistanceHit> distances = new NativeList<DistanceHit>(Allocator.Temp);
-                    if (!physicsWorld.OverlapSphere(position + math.up(), 0.1f, ref distances, CollisionFilter.Default))
+                    if (physicsWorld.CastRay(input.Value, out var hit))
                     {
-                        SpawnRobot(position, spawnCategory);
+                        var position = math.round(hit.Position) + math.up();
+                        NativeList<DistanceHit> distances = new NativeList<DistanceHit>(Allocator.Temp);
+                        if (!physicsWorld.OverlapSphere(position + math.up(), 0.1f, ref distances, CollisionFilter.Default))
+                        {
+                            SpawnRobot(position, spawnCategory);
+                        }
                     }
                 }
+                inputs.Clear();
             }
-            inputs.Clear();
         }
 
         //ToDo: Is this needed or not?

@@ -1,5 +1,6 @@
 using System;
 using TMPro;
+using Unity.Entities;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -27,6 +28,8 @@ public class EnergySystemAndRobotSpawnCtrl : MonoBehaviour
     public Button randomSpawnButtonForCategory3Robots;
     public Button randomSpawnButtonForEnergySystems;
     public TMP_Dropdown spawnCategoryDropDown;
+
+    private World _world = null;
 
     private void Awake()
     {
@@ -70,21 +73,33 @@ public class EnergySystemAndRobotSpawnCtrl : MonoBehaviour
 
     private void onClickOfRandomSpawnButtonForCategory1Robots()
     {
-        numberOfCategory1RobotsToSpawn += 50;
+        numberOfCategory1RobotsToSpawn = GetRobotsCount(SpawnCategory.ROBOT_CATEGORY_1) + 50;
     }
 
     private void onClickOfRandomSpawnButtonForCategory2Robots()
     {
-        numberOfCategory2RobotsToSpawn += 50;
+        numberOfCategory2RobotsToSpawn = GetRobotsCount(SpawnCategory.ROBOT_CATEGORY_2) + 50;
     }
 
     private void onClickOfRandomSpawnButtonForCategory3Robots()
     {
-        numberOfCategory3RobotsToSpawn += 50;
+        numberOfCategory3RobotsToSpawn = GetRobotsCount(SpawnCategory.ROBOT_CATEGORY_3) + 50;
     }
 
     private void onClickOfRandomSpawnButtonForEnergySystems()
     {
         numberOfEnergySystemsToSpawn += 5;
+    }
+
+    private int GetRobotsCount(SpawnCategory spawnCategory)
+    {
+        if(_world == null)
+        {
+            _world = World.DefaultGameObjectInjectionWorld;
+        }
+
+        EntityQuery query = _world.EntityManager.CreateEntityQuery(ComponentType.ReadOnly(typeof(T_Robot)));
+        query.AddSharedComponentFilter(new T_Robot() { spawnCategory = spawnCategory });
+        return query.CalculateEntityCount();
     }
 }

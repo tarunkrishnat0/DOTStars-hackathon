@@ -1,6 +1,6 @@
 using Unity.Entities;
 
-public struct T_EnergyStation : IComponentData, ICleanupComponentData
+public struct T_EnergyStation : ICleanupComponentData
 {
 
 }
