@@ -6,4 +6,5 @@ public struct C_EnergyStationSpawnerConfig : IComponentData
     public int NumberOfEnergyStationsToSpawn;
     public float MinSpeed;
     public float MaxSpeed;
+    public float EnergyStationHealth;
 }

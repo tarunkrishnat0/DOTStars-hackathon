@@ -7,6 +7,8 @@ public class EnergyStationSpawnerConfig : MonoBehaviour
 	public int NumberOfEnergyStationsToSpawn;
 	public float MaxSpeed;
 	public float MinSpeed;
+	public float EnergyStationHealth;
+
 	class Baker : Baker<EnergyStationSpawnerConfig>
 	{
 		public override void Bake(EnergyStationSpawnerConfig authoring)
@@ -16,7 +18,8 @@ public class EnergyStationSpawnerConfig : MonoBehaviour
 				Prefab = GetEntity(authoring.EnergyStation),
 				NumberOfEnergyStationsToSpawn = authoring.NumberOfEnergyStationsToSpawn,
 				MaxSpeed = authoring.MaxSpeed,
-				MinSpeed = authoring.MinSpeed
+				MinSpeed = authoring.MinSpeed,
+				EnergyStationHealth = authoring.EnergyStationHealth
 			});
 		}
 	}
