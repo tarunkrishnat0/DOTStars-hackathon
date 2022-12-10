@@ -7,8 +7,9 @@ Input:
 Conditions:
 - [ ] On EnergyStation spawn, it starts moving in a random direction with random speed.
 - [x] On Robot Spawn, its speed is randomly decided but it always towards the nearest energy point.
-- [ ] Robots color change based on their closeness to the energy point.
-- [ ] On hitting the boundary, Robots and EnergyStations get reflected.
+- [x] Robots color change based on their closeness to the energy point.
+- [x] On hitting the boundary, Robots get reflected.
+- [ ] On hitting the boundary, EnergyStations get reflected.
 
 Termination:
 - [x] On reaching the target EnergyStation, Robots will die due to high voltage :dizzy_face:
