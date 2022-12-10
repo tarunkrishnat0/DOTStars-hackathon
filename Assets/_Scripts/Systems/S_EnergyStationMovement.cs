@@ -22,13 +22,10 @@ public partial struct S_EnergyStationMovement : ISystem
         var gameConfig = SystemAPI.GetSingleton<C_GameConfig>();
         var deltaTime = SystemAPI.Time.DeltaTime;
 
-        var ecbEOS = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(state.WorldUnmanaged).AsParallelWriter();
-
         new EnergyStationMovementJob()
         {
             DeltaTime = deltaTime,
             GameConfig = gameConfig,
-            ECB = ecbEOS
         }.ScheduleParallel();
     }
 }
@@ -39,10 +36,9 @@ public partial struct EnergyStationMovementJob : IJobEntity
 {
     public float DeltaTime;
     public C_GameConfig GameConfig;
-    public EntityCommandBuffer.ParallelWriter ECB;
 
     [BurstCompile]
-    public void Execute(Entity entity, ref TransformAspect transform, ref C_EnergyStationMovementProperties movementProperties, [EntityIndexInQuery] int sortKey)
+    public void Execute(ref TransformAspect transform, ref C_EnergyStationMovementProperties movementProperties)
     {
         var position = transform.LocalPosition + movementProperties.Direction * movementProperties.Speed * DeltaTime;
         if (position.x > GameConfig.TerrainMaxBoundaries.x || position.x < GameConfig.TerrainMinBoundaries.x)
