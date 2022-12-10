@@ -68,21 +68,27 @@ public partial struct S_RobotSpawner : ISystem
             });
         }
 
-        for (int index = robotsCat1Count; index < spawnerConfig.NumberOfRobotsToSpawn; index++)
+        int totalNumberOfCategory1RobotsToSpawn = EnergySystemAndRobotSpawnCtrl.instance.numberOfCategory1RobotsToSpawn +
+            spawnerConfig.NumberOfCategory1RobotsToSpawn;
+        for (int index = robotsCat1Count; index < totalNumberOfCategory1RobotsToSpawn; index++)
         {
             var position = random.ValueRW.random.NextFloat3(gameConfig.TerrainMinBoundaries.x, gameConfig.TerrainMaxBoundaries.x);
             position.y = 1f;             
             SpawnRobot(position, SpawnCategory.ROBOT_CATEGORY_1);
         }
 
-        for (int index = robotsCat2Count; index < spawnerConfig.NumberOfRobotsToSpawn; index++)
+        int totalNumberOfCategory2RobotsToSpawn = EnergySystemAndRobotSpawnCtrl.instance.numberOfCategory2RobotsToSpawn +
+            spawnerConfig.NumberOfCategory2RobotsToSpawn;
+        for (int index = robotsCat2Count; index < totalNumberOfCategory2RobotsToSpawn; index++)
         {
             var position = random.ValueRW.random.NextFloat3(gameConfig.TerrainMinBoundaries.x, gameConfig.TerrainMaxBoundaries.x);
             position.y = 1f;
             SpawnRobot(position, SpawnCategory.ROBOT_CATEGORY_2);
         }
 
-        for (int index = robotsCat3Count; index < spawnerConfig.NumberOfRobotsToSpawn; index++)
+        int totalNumberOfCategory3RobotsToSpawn = EnergySystemAndRobotSpawnCtrl.instance.numberOfCategory3RobotsToSpawn +
+            spawnerConfig.NumberOfCategory3RobotsToSpawn;
+        for (int index = robotsCat3Count; index < totalNumberOfCategory3RobotsToSpawn; index++)
         {
             var position = random.ValueRW.random.NextFloat3(gameConfig.TerrainMinBoundaries.x, gameConfig.TerrainMaxBoundaries.x);
             position.y = 1f;

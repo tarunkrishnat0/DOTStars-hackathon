@@ -24,11 +24,15 @@ public partial struct S_EnergyStationSpawner : ISystem
         var gameConfig = SystemAPI.GetSingleton<C_GameConfig>();
         var random = SystemAPI.GetSingletonRW<C_GameRandom>();
 
-        // var ecb = new EntityCommandBuffer(Unity.Collections.Allocator.Temp);
-
         var ecb = SystemAPI.GetSingleton<BeginInitializationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(state.WorldUnmanaged);
 
-        for (int i = 0; i < energyStationConfig.NumberOfEnergyStationsToSpawn; i++)
+        var query = SystemAPI.QueryBuilder().WithAll<T_EnergyStation>().Build();
+        var energySystemsCount = query.CalculateEntityCount();
+
+        int totalNumberOfEnergySystemsToSpawn = energyStationConfig.NumberOfEnergyStationsToSpawn + 
+            EnergySystemAndRobotSpawnCtrl.instance.numberOfEnergySystemsToSpawn;
+
+        for (int i = energySystemsCount; i < totalNumberOfEnergySystemsToSpawn; i++)
         {
             var entity = ecb.Instantiate(energyStationConfig.Prefab);
             var position = random.ValueRW.random.NextFloat3(gameConfig.TerrainMinBoundaries.x, gameConfig.TerrainMaxBoundaries.x);
@@ -57,6 +61,6 @@ public partial struct S_EnergyStationSpawner : ISystem
         //ecb.Playback(state.EntityManager);
         //ecb.Dispose();
 
-        state.Enabled = false;
+        //state.Enabled = false;
     }
 }
