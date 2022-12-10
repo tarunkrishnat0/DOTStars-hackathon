@@ -8,15 +8,9 @@ using Unity.Transforms;
 [BurstCompile]
 public partial struct S_RobotMovement : ISystem
 {
-    EntityQuery query;
-
     [BurstCompile]
     public void OnCreate(ref SystemState state)
     {
-        query = new EntityQueryBuilder(Unity.Collections.Allocator.Temp)
-            .WithAll<T_EnergyStation>()
-            .WithAllRW<LocalTransform>()
-            .Build(ref state);
     }
 
     [BurstCompile]
@@ -33,10 +27,13 @@ public partial struct S_RobotMovement : ISystem
         var query = SystemAPI.QueryBuilder().WithAll<T_EnergyStation, LocalTransform>().Build();
         var energyStationTransforms = query.ToComponentDataArray<LocalTransform>(Unity.Collections.Allocator.TempJob);
 
+        var ecbEOS = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(state.WorldUnmanaged).AsParallelWriter();
+
         new RobotMovementJob() {
             DeltaTime = deltaTime,
             GameConfig = gameConfig,
-            energyStations = energyStationTransforms
+            energyStations = energyStationTransforms,
+            ECB = ecbEOS
         }.ScheduleParallel();
     }
 }
@@ -47,10 +44,11 @@ public partial struct RobotMovementJob : IJobEntity
 {
     public float DeltaTime;
     public C_GameConfig GameConfig;
+    public EntityCommandBuffer.ParallelWriter ECB;
     [ReadOnly] public NativeArray<LocalTransform> energyStations;
 
     [BurstCompile]
-    public void Execute(ref TransformAspect transform, ref C_RobotMovementProperties movementProperties)
+    public void Execute(Entity entity, ref TransformAspect transform, ref C_RobotMovementProperties movementProperties, [EntityIndexInQuery] int sortKey)
     {
         float minDistance = float.MaxValue;
         int nearestEnergyStationIndex = 0;
@@ -62,6 +60,12 @@ public partial struct RobotMovementJob : IJobEntity
                 nearestEnergyStationIndex = i;
                 minDistance = distance;
             }
+        }
+
+        if (math.distance(energyStations[nearestEnergyStationIndex].Position, transform.LocalPosition) < 2)
+        {
+            ECB.DestroyEntity(sortKey, entity);
+            return;
         }
 
         float3 directionTowardsNearestEnergyStation = energyStations[nearestEnergyStationIndex].Position - transform.LocalPosition;
@@ -81,5 +85,6 @@ public partial struct RobotMovementJob : IJobEntity
 
         transform.LocalPosition += movementProperties.Direction * movementProperties.Speed * DeltaTime;
         transform.LocalRotation = quaternion.LookRotation(movementProperties.Direction, math.up());
+
     }
 }

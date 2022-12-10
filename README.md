@@ -11,7 +11,7 @@ Conditions:
 - [ ] On hitting the boundary, Robots and EnergyStations get reflected.
 
 Termination:
-- [ ] On reaching the target EnergyStation, Robots will die due to high voltage :dizzy_face:
+- [x] On reaching the target EnergyStation, Robots will die due to high voltage :dizzy_face:
 
 # Project Settings
 - Unity 2022.2.0f1
