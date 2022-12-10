@@ -1,8 +1,10 @@
 # Problem Statement
 Input:
-- [x] Spawn `N` number of Robots(capsules) at start.
+- [ ] Spawn `N` number of Robots(capsules) at start per category.
 - [x] Spawn `M` number of EnergyStations(spheres) at start.
-- [ ] Spawn EnergyStation based on the user clicks.
+- [ ] Option in UI for user to choose the spawn category - robots/energyStation.
+- [ ] Spawn Robot/EnergyStation in the position where user clicks.
+- [ ] Spawn Robot/EnergyStation in random positions if user chosses random position spawn.
 
 Conditions:
 - [ ] On EnergyStation spawn, it starts moving in a random direction with random speed.
@@ -10,9 +12,11 @@ Conditions:
 - [x] Robots color change based on their closeness to the energy point.
 - [x] On hitting the boundary, Robots get reflected.
 - [ ] On hitting the boundary, EnergyStations get reflected.
+- [ ] EnergyStation capacity drops when a robot comes near it
 
 Termination:
 - [x] On reaching the target EnergyStation, Robots will die due to high voltage :dizzy_face:
+- [ ] When energy station capacity drops to zero, it dies
 
 # Project Settings
 - Unity 2022.2.0f1
