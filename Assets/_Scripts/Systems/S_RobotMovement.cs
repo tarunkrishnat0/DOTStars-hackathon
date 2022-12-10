@@ -2,7 +2,9 @@ using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
+using Unity.Rendering;
 using Unity.Transforms;
+using UnityEngine;
 
 [UpdateInGroup(typeof(SimulationSystemGroup))]
 [BurstCompile]
@@ -24,15 +26,17 @@ public partial struct S_RobotMovement : ISystem
         var gameConfig = SystemAPI.GetSingleton<C_GameConfig>();
         var deltaTime = SystemAPI.Time.DeltaTime;
         
-        var query = SystemAPI.QueryBuilder().WithAll<T_EnergyStation, LocalTransform>().Build();
-        var energyStationTransforms = query.ToComponentDataArray<LocalTransform>(Unity.Collections.Allocator.TempJob);
+        var query = SystemAPI.QueryBuilder().WithAll<T_EnergyStation, LocalTransform, URPMaterialPropertyBaseColor>().Build();
+        var energyStationTransforms = query.ToComponentDataArray<LocalTransform>(Allocator.TempJob);
+        var energyStationColors = query.ToComponentDataArray<URPMaterialPropertyBaseColor>(Allocator.TempJob);
 
         var ecbEOS = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(state.WorldUnmanaged).AsParallelWriter();
 
         new RobotMovementJob() {
             DeltaTime = deltaTime,
             GameConfig = gameConfig,
-            energyStations = energyStationTransforms,
+            EnergyStationTransforms = energyStationTransforms,
+            EneryStationColors = energyStationColors,
             ECB = ecbEOS
         }.ScheduleParallel();
     }
@@ -45,16 +49,19 @@ public partial struct RobotMovementJob : IJobEntity
     public float DeltaTime;
     public C_GameConfig GameConfig;
     public EntityCommandBuffer.ParallelWriter ECB;
-    [ReadOnly] public NativeArray<LocalTransform> energyStations;
+    [ReadOnly] public NativeArray<LocalTransform> EnergyStationTransforms;
+    [ReadOnly] public NativeArray<URPMaterialPropertyBaseColor> EneryStationColors;
 
     [BurstCompile]
-    public void Execute(Entity entity, ref TransformAspect transform, ref C_RobotMovementProperties movementProperties, [EntityIndexInQuery] int sortKey)
+    public void Execute(Entity entity, ref TransformAspect transform, ref C_RobotMovementProperties movementProperties, 
+        [EntityIndexInQuery] int sortKey, ref URPMaterialPropertyBaseColor baseColor, ref URPMaterialPropertyEmissionColor emissionColor)
     {
+        float maxDistance = 100f * math.sqrt(2);
         float minDistance = float.MaxValue;
         int nearestEnergyStationIndex = 0;
-        for (int i = 0; i < energyStations.Length; i++)
+        for (int i = 0; i < EnergyStationTransforms.Length; i++)
         {
-            float distance = math.distance(energyStations[i].Position, transform.LocalPosition);
+            float distance = math.distance(EnergyStationTransforms[i].Position, transform.LocalPosition);
             if (distance < minDistance)
             {
                 nearestEnergyStationIndex = i;
@@ -62,15 +69,26 @@ public partial struct RobotMovementJob : IJobEntity
             }
         }
 
-        if (math.distance(energyStations[nearestEnergyStationIndex].Position, transform.LocalPosition) < 2)
+        if (math.distance(EnergyStationTransforms[nearestEnergyStationIndex].Position, transform.LocalPosition) < 2)
         {
             ECB.DestroyEntity(sortKey, entity);
             return;
         }
 
-        float3 directionTowardsNearestEnergyStation = energyStations[nearestEnergyStationIndex].Position - transform.LocalPosition;
+        float3 directionTowardsNearestEnergyStation = EnergyStationTransforms[nearestEnergyStationIndex].Position - transform.LocalPosition;
         directionTowardsNearestEnergyStation.y = 0;
         directionTowardsNearestEnergyStation = math.normalize(directionTowardsNearestEnergyStation);
+
+        float currentDistance = math.distance(EnergyStationTransforms[nearestEnergyStationIndex].Position, transform.LocalPosition);
+        float closenessfactor = (maxDistance - currentDistance) / maxDistance;
+
+        var energyStationTempColor = EneryStationColors[nearestEnergyStationIndex].Value;
+        float3 energeStationColor = new float3(energyStationTempColor.x, energyStationTempColor.y, energyStationTempColor.z);
+        float3 finalColor = math.lerp(new float3(1,1,1), energeStationColor, closenessfactor);
+
+        baseColor.Value = new Vector4(finalColor.x, finalColor.y, finalColor.z, 1);
+        emissionColor.Value = baseColor.Value;
+
         movementProperties.Direction = directionTowardsNearestEnergyStation;
 
         var position = transform.LocalPosition + movementProperties.Direction * movementProperties.Speed * DeltaTime;
@@ -85,6 +103,5 @@ public partial struct RobotMovementJob : IJobEntity
 
         transform.LocalPosition += movementProperties.Direction * movementProperties.Speed * DeltaTime;
         transform.LocalRotation = quaternion.LookRotation(movementProperties.Direction, math.up());
-
     }
 }

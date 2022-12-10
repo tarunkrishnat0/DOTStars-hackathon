@@ -1,6 +1,7 @@
 using Unity.Burst;
 using Unity.Entities;
 using Unity.Mathematics;
+using Unity.Rendering;
 using Unity.Transforms;
 
 [UpdateInGroup(typeof(InitializationSystemGroup))]
@@ -40,6 +41,9 @@ public partial struct S_EnergyStationSpawner : ISystem
             });
 
             ecb.AddComponent<T_EnergyStation>(entity);
+            var color = (UnityEngine.Vector4)Utilities.RandomColor(random.ValueRW.random.NextFloat(0f, 1f));
+            ecb.AddComponent(entity, new URPMaterialPropertyBaseColor() { Value = color });
+            ecb.AddComponent(entity, new URPMaterialPropertyEmissionColor() { Value = color });
         }
 
         //ecb.Playback(state.EntityManager);

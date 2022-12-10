@@ -1,6 +1,7 @@
 using Unity.Burst;
 using Unity.Entities;
 using Unity.Mathematics;
+using Unity.Rendering;
 using Unity.Transforms;
 
 [UpdateInGroup(typeof(InitializationSystemGroup))]
@@ -41,7 +42,11 @@ public partial struct S_RobotSpawner : ISystem
                 Rotation = quaternion.LookRotation(position, math.up()),
                 Scale = 1,
             });
+            
             ecb.AddComponent<T_Robot>(entity);
+            ecb.AddComponent<URPMaterialPropertyBaseColor>(entity);
+            ecb.AddComponent<URPMaterialPropertyEmissionColor>(entity);
+
             position.y = 0f;
             var direction = math.normalize(position);
             ecb.AddComponent(entity, new C_RobotMovementProperties()
