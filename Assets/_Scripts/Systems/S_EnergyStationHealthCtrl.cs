@@ -37,7 +37,7 @@ public partial struct S_EnergyStationHealthCtrl : ISystem
             PhysicsWorld = physicsWorld,
             CollisionLayerBelongsTo = spawnConfig.CollisionLayerBelongsTo,
             CollisionLayerCollidesWith = spawnConfig.CollisionLayerCollidesWith,
-        }.Schedule();
+        }.ScheduleParallel();
     }
 }
 
@@ -46,7 +46,7 @@ public partial struct S_EnergyStationHealthCtrl : ISystem
 public partial struct EnergyStationHealthJob : IJobEntity
 {
     public EntityCommandBuffer.ParallelWriter ECB;
-    public PhysicsWorldSingleton PhysicsWorld;
+    [ReadOnly] public PhysicsWorldSingleton PhysicsWorld;
     [ReadOnly] public uint CollisionLayerBelongsTo;
     [ReadOnly] public uint CollisionLayerCollidesWith;
 
