@@ -48,36 +48,13 @@ public partial struct S_RobotSpawner : ISystem
         var robotsCat3Count = query.CalculateEntityCount();
         //Debug.Log($"CAT1={robotsCat1Count}, CAT2={robotsCat2Count}, CAT3={robotsCat3Count}");
 
-        void SpawnRobot(float3 position, SpawnCategory spawnCategory)
-        {
-            var entity = ecb.Instantiate(spawnerConfig.Prefab);
-            ecb.SetComponent(entity, new LocalTransform()
-            {
-                Position = position,
-                Rotation = quaternion.LookRotation(position, math.up()),
-                Scale = 1,
-            });
-
-            ecb.AddSharedComponent<T_Robot>(entity, new T_Robot() { spawnCategory = spawnCategory });
-            ecb.AddComponent<URPMaterialPropertyBaseColor>(entity);
-            ecb.AddComponent<URPMaterialPropertyEmissionColor>(entity);
-
-            position.y = 0f;
-            var direction = math.normalize(position);
-            ecb.AddComponent(entity, new C_RobotMovementProperties()
-            {
-                Direction = direction,
-                Speed = random.ValueRW.random.NextFloat(spawnerConfig.MinSpeed, spawnerConfig.MaxSpeed),
-            });
-        }
-
         int totalNumberOfDumbRobotsToSpawn = spawnerCount.NumberOfDumbRobotsToSpawn;
         // Debug.Log("totalNumberOfDumbRobotsToSpawn : " + totalNumberOfDumbRobotsToSpawn + " robotsCat1Count : " + robotsCat1Count);
         for (int index = robotsCat1Count; index < totalNumberOfDumbRobotsToSpawn; index++)
         {
             var position = random.ValueRW.random.NextFloat3(gameConfig.TerrainMinBoundaries.x, gameConfig.TerrainMaxBoundaries.x);
-            position.y = 1f;             
-            SpawnRobot(position, SpawnCategory.DUMB_ROBOT);
+            position.y = 1f;
+            Utilities.SpawnRobot(position, SpawnCategory.DUMB_ROBOT, spawnerConfig, ecb, random);
         }
 
         int totalNumberOfCategory2RobotsToSpawn = spawnerCount.NumberOfSemiSmartRobotsToSpawn;
@@ -85,7 +62,7 @@ public partial struct S_RobotSpawner : ISystem
         {
             var position = random.ValueRW.random.NextFloat3(gameConfig.TerrainMinBoundaries.x, gameConfig.TerrainMaxBoundaries.x);
             position.y = 1f;
-            SpawnRobot(position, SpawnCategory.SEMI_SMART_ROBOT);
+            Utilities.SpawnRobot(position, SpawnCategory.SEMI_SMART_ROBOT, spawnerConfig, ecb, random);
         }
 
         int totalNumberOfCategory3RobotsToSpawn = spawnerCount.NumberOfSmartRobotsToSpawn;
@@ -93,7 +70,7 @@ public partial struct S_RobotSpawner : ISystem
         {
             var position = random.ValueRW.random.NextFloat3(gameConfig.TerrainMinBoundaries.x, gameConfig.TerrainMaxBoundaries.x);
             position.y = 1f;
-            SpawnRobot(position, SpawnCategory.SMART_ROBOT);
+            Utilities.SpawnRobot(position, SpawnCategory.SMART_ROBOT, spawnerConfig, ecb, random);
         }
 
         SpawnCategory spawnCategory = SystemAPI.GetSingleton<C_CurrentSpawnCategoryOfMouseClick>().spawnCategory;
@@ -110,7 +87,7 @@ public partial struct S_RobotSpawner : ISystem
                         NativeList<DistanceHit> distances = new NativeList<DistanceHit>(Allocator.Temp);
                         if (!physicsWorld.OverlapSphere(position + math.up(), 0.1f, ref distances, CollisionFilter.Default))
                         {
-                            SpawnRobot(position, spawnCategory);
+                            Utilities.SpawnRobot(position, spawnCategory, spawnerConfig, ecb, random);
                         }
                     }
                 }

@@ -52,4 +52,27 @@ public class Utilities
         ecb.AddComponent(entity, new C_EnergyStationHealthProperty() { EnergyStationHealth = health });
 
     }
+
+    public static void SpawnRobot(float3 position, SpawnCategory spawnCategory, C_RobotSpawnerConfig spawnerConfig, EntityCommandBuffer ecb, RefRW<C_GameRandom> random)
+    {
+        var entity = ecb.Instantiate(spawnerConfig.Prefab);
+        ecb.SetComponent(entity, new LocalTransform()
+        {
+            Position = position,
+            Rotation = quaternion.LookRotation(position, math.up()),
+            Scale = 1,
+        });
+
+        ecb.AddSharedComponent<T_Robot>(entity, new T_Robot() { spawnCategory = spawnCategory });
+        ecb.AddComponent<URPMaterialPropertyBaseColor>(entity);
+        ecb.AddComponent<URPMaterialPropertyEmissionColor>(entity);
+
+        position.y = 0f;
+        var direction = math.normalize(position);
+        ecb.AddComponent(entity, new C_RobotMovementProperties()
+        {
+            Direction = direction,
+            Speed = random.ValueRW.random.NextFloat(0f, 5f),
+        });
+    }
 }
