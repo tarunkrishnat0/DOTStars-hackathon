@@ -1,6 +1,4 @@
-using System;
 using TMPro;
-using Unity.Collections;
 using Unity.Entities;
 using UnityEngine;
 using UnityEngine.UI;
@@ -90,6 +88,13 @@ public class EnergySystemAndRobotSpawnCtrl : MonoBehaviour
             return SpawnCategory.SMART_ROBOT;
         else
             return SpawnCategory.ENERGY_SYSTEM;
+    }
+
+    public int GetRobotsCount()
+    {
+        // Check only non destroyed robots
+        EntityQuery query = _world.EntityManager.CreateEntityQuery(ComponentType.ReadOnly(typeof(T_Robot)), ComponentType.ReadOnly(typeof(C_RobotMovementProperties)));
+        return query.CalculateEntityCount();
     }
 
     private void onClickOfRandomSpawnButtonForCategory1Robots()

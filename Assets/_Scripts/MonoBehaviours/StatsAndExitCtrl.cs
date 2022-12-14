@@ -6,7 +6,9 @@ public class StatsAndExitCtrl : MonoBehaviour
 {
     [SerializeField] private TMP_Text _fpsText;
     [SerializeField] private TMP_Text _showHideStatsText;
-    
+    [SerializeField] private TMP_Text _robotsCount;
+    [SerializeField] private EnergySystemAndRobotSpawnCtrl _spawnCtrl;
+
     private double deltaTime = 0;
     private int currentFPS = 0;
     private int averageFPS = 0;
@@ -67,6 +69,8 @@ public class StatsAndExitCtrl : MonoBehaviour
             // Your code logic here
             _fpsText.text += SetStatsInUI();
         }
+
+        _robotsCount.text = "Alive Robots: " + _spawnCtrl.GetRobotsCount().ToString();
     }
 
     public void OnClickOfExit()
